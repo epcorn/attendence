@@ -1,4 +1,7 @@
-const login = async (req, res, next) => { };
+const login = async (req, res, next) => {
+    const { email, phone, password } = req.body;
+
+};
 const setAdmin = async (req, res, next) => { };
 const setOprato = async (req, res, next) => { };
 const newEmployee = async (req, res, next) => { };
