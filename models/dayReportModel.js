@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import Employee from "./employeeModel";
 
 const dayReportSchema = mongoose.Schema({
-    emp_id: {
+    empId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Employee',
         required: true,
@@ -11,11 +11,14 @@ const dayReportSchema = mongoose.Schema({
         type: Date,
         required: true,
     },
-    checked_out: Date,
     day_schedule_type: {
         type: String,
         enum: ["full", "half"],
         default: "full"
+    },
+    isLate: {
+        type: Boolean,
+        default: false,
     }
 
 });

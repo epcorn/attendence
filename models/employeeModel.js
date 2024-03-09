@@ -21,7 +21,8 @@ const employeeSchema = new mongoose.Schema({
     division: {
         type: String,
         enum: ['pc', 'lc', 'att', 'os', 'fs'],
-    }
+    },
+
 });
 
 
