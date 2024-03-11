@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { checkIn, changeDayScheduleType, undoChekIn } from '../controllers/dayReportController';
+import { checkIn, changeDayScheduleType, undoChekIn } from '../controllers/dayReportController.js';
 const router = Router();
 
 router.post("/checkIn", checkIn);

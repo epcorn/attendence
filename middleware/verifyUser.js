@@ -4,7 +4,7 @@ import { errorHandler } from "../utils/error.js";
 const verifyToken = (req, res, next) => {
     const token = req.cookies.access_token;
     if (!token) {
-        return next(errorHandler(401, "unauthorized")); // HTTP status code for Unauthorized
+        return next(errorHandler(401, "unauthorized"));
     }
 
     jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
@@ -16,8 +16,25 @@ const verifyToken = (req, res, next) => {
     });
 };
 
-const verifyAdmin = (req, res, next) => { };
-const verifyOprator = (req, res, next) => { };
+const ifAdmin = (req, res, next) => {
+    if (!req.user.isAdmin) {
+        return next(errorHandler(403, "Forbidden"));
+    }
+    next();
+};
+const ifOprator = (req, res, next) => {
+    if (!req.user.isAdmin) {
+        return next(errorHandler(403, "Forbidden"));
+    }
+    next();
+};
 
-export { verifyToken, verifyAdmin, verifyOprator }
+const ifOpratorOrAdmin = (req, res, next) => {
+    if (!req.user.isAdmin && !req.user.isOprator) {
+        return next(errorHandler(403, "Forbidden"));
+    }
+    next();
+};
+
+export { verifyToken, ifAdmin, ifOprator, ifOpratorOrAdmin }
 

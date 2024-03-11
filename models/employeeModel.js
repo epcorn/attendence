@@ -10,9 +10,15 @@ const employeeSchema = new mongoose.Schema({
         type: String,
         maxlength: 30,
     },
-    email: String,
+    email: {
+        type: String,
+        required: true,
+        unique: true,
+    },
     phone: Number,
-    password: String,
+    password: {
+        type: String
+    },
     isAdmin: {
         type: Boolean,
         default: false,
@@ -42,8 +48,8 @@ employeeSchema.pre('save', async function encryptPass() {
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
 });
-employeeSchema.methods.comparePassword = async function (password,) {
-    return await bcrypt.compare(password, this.password);
+employeeSchema.methods.comparePassword = async function (pass) {
+    return await bcrypt.compare(pass, this.password);
 };
 
 const Employee = mongoose.model('Employee', employeeSchema);
