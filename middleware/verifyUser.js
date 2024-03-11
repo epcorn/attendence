@@ -23,7 +23,7 @@ const ifAdmin = (req, res, next) => {
     next();
 };
 const ifOprator = (req, res, next) => {
-    if (!req.user.isAdmin) {
+    if (!req.user.isOprator) {
         return next(errorHandler(403, "Forbidden"));
     }
     next();
