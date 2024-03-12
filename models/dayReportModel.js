@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const checkInSchema = mongoose.Schema({
+const staffTimelogSchema = mongoose.Schema({
     employeeId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Employee',
@@ -21,34 +21,34 @@ const checkInSchema = mongoose.Schema({
     }
 });
 
-const dayReportSchema = mongoose.Schema({
-    date: {
+const workdayStatusSchema = mongoose.Schema({
+    attendanceDate: {
         type: Date,
         default: Date.now,
         unique: true,
     },
-    checkIns: {
+    attendanceRecords: {
         type: [mongoose.Schema.Types.ObjectId],
         ref: 'CheckIn',
     }
 });
 
 // Method to check if a check-in exists for a specific employee in a day report
-dayReportSchema.methods.hasCheckInForEmployee = async function (employeeId) {
-    const checkIns = await this.model('CheckIn').find({ _id: { $in: this.checkIns } });
-    return checkIns.some(checkIn => checkIn.employeeId.equals(employeeId));
+workdayStatusSchema.methods.hasCheckInForEmployee = async function (employeeId) {
+    const attendanceRecords = await this.model('CheckIn').find({ _id: { $in: this.attendanceRecords } });
+    return attendanceRecords.some(checkIn => checkIn.employeeId.equals(employeeId));
 };
 
 // Method to get check-in data for a specific employee in a day report
-dayReportSchema.methods.getEmployeeCheckInData = async function (employeeId) {
-    const checkIns = await this.model('CheckIn').find({ _id: { $in: this.checkIns } });
-    return checkIns.find(checkIn => checkIn.employeeId.equals(employeeId));
+workdayStatusSchema.methods.getEmployeeCheckInData = async function (employeeId) {
+    const attendanceRecords = await this.model('CheckIn').find({ _id: { $in: this.attendanceRecords } });
+    return attendanceRecords.find(checkIn => checkIn.employeeId.equals(employeeId));
 };
 
 // Method to update check-in data for a specific employee in a day report
-dayReportSchema.methods.toogleDayScheduleType = async function (employeeId) {
-    const checkIns = await this.model('CheckIn').find({ _id: { $in: this.checkIns } });
-    const checkInToUpdate = await checkIns.find(checkIn => checkIn.employeeId.equals(employeeId));
+workdayStatusSchema.methods.toogleDayScheduleType = async function (employeeId) {
+    const attendanceRecords = await this.model('CheckIn').find({ _id: { $in: this.attendanceRecords } });
+    const checkInToUpdate = await attendanceRecords.find(checkIn => checkIn.employeeId.equals(employeeId));
 
     if (checkInToUpdate) {
         checkInToUpdate.dayScheduleType = checkInToUpdate.dayScheduleType === "full" ? "half" : "full";
@@ -59,9 +59,9 @@ dayReportSchema.methods.toogleDayScheduleType = async function (employeeId) {
     }
 };
 
-dayReportSchema.methods.undoCheckIn = async function (employeeId) {
-    const checkIns = await this.model('CheckIn').find({ _id: { $in: this.checkIns } });
-    const checkInToUpdate = checkIns.find(checkIn => checkIn.employeeId.equals(employeeId));
+workdayStatusSchema.methods.undoCheckIn = async function (employeeId) {
+    const attendanceRecords = await this.model('CheckIn').find({ _id: { $in: this.attendanceRecords } });
+    const checkInToUpdate = attendanceRecords.find(checkIn => checkIn.employeeId.equals(employeeId));
 
     if (checkInToUpdate) {
         // Remove the checkInToUpdate document from the "CheckIn" collection
@@ -71,8 +71,8 @@ dayReportSchema.methods.undoCheckIn = async function (employeeId) {
             throw new Error('Failed to remove the check-in document from the collection.');
         }
 
-        // Remove the checkInToUpdate document ID from the checkIns array in the dayReport document
-        this.checkIns.pull(checkInToUpdate._id);
+        // Remove the checkInToUpdate document ID from the attendanceRecords array in the WorkdayStatus document
+        this.attendanceRecords.pull(checkInToUpdate._id);
         await this.save();
 
         return removedCheckIn;
@@ -81,9 +81,9 @@ dayReportSchema.methods.undoCheckIn = async function (employeeId) {
     }
 };
 
-dayReportSchema.methods.toggleLate = async function (employeeId) {
-    const checkIns = await this.model('CheckIn').find({ _id: { $in: this.checkIns } });
-    const checkInToUpdate = await checkIns.find(checkIn => checkIn.employeeId.equals(employeeId));
+workdayStatusSchema.methods.toggleLate = async function (employeeId) {
+    const attendanceRecords = await this.model('CheckIn').find({ _id: { $in: this.attendanceRecords } });
+    const checkInToUpdate = await attendanceRecords.find(checkIn => checkIn.employeeId.equals(employeeId));
 
     if (checkInToUpdate) {
         checkInToUpdate.isLate = checkInToUpdate.isLate === true ? false : true;
@@ -96,25 +96,25 @@ dayReportSchema.methods.toggleLate = async function (employeeId) {
 
 
 // Function to create or update a day report for the current date
-const createOrUpdateDayReport = async () => {
+const createOrUpdateWorkdayStatus = async () => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    let dayReport = await DayReport.findOne({ date: today });
+    let WorkdayStatus = await WorkdayStatus.findOne({ date: today });
 
-    if (!dayReport) {
-        dayReport = new DayReport({ date: today });
+    if (!WorkdayStatus) {
+        WorkdayStatus = new WorkdayStatus({ date: today });
     }
 
-    return dayReport;
+    return WorkdayStatus;
 };
 
 // Function to add a check-in to a day report
-const addCheckInToDayReport = async (checkInData) => {
-    const dayReport = await createOrUpdateDayReport();
-    dayReport.checkIns.push(checkInData._id);
-    await dayReport.save();
+const addCheckInToWorkdayStatus = async (checkInData) => {
+    const WorkdayStatus = await createOrUpdateWorkdayStatus();
+    WorkdayStatus.attendanceRecords.push(checkInData._id);
+    await WorkdayStatus.save();
 };
-const DayReport = mongoose.model('DayReport', dayReportSchema);
-const CheckIn = mongoose.model('CheckIn', checkInSchema);
+const WorkdayStatus = mongoose.model('WorkdayStatus', workdayStatusSchema);
+const StaffTimelog = mongoose.model('CheckIn', staffTimelogSchema);
 
-export { DayReport, CheckIn, createOrUpdateDayReport, addCheckInToDayReport };
+export { WorkdayStatus, StaffTimelog, createOrUpdateWorkdayStatus, addCheckInToWorkdayStatus };
