@@ -9,7 +9,7 @@ const checkIn = async (req, res, next) => {
         if (hasCheckedIn) {
             return res.status(200).json({ "message": "User alredy checked In" });
         }
-        const checkInData = await CheckIn.create({ empId });
+        const checkInData = await CheckIn.create({ employeeId: empId });
         addCheckInToDayReport(checkInData);
 
         res.status(200).json({ "message": `user checke in`, checkInData });
@@ -19,13 +19,40 @@ const checkIn = async (req, res, next) => {
     }
 };
 const changeDayScheduleType = async (req, res, next) => {
-    const { empId } = req.params;
-    const dayReport = await createOrUpdateDayReport();
-    const employee = await dayReport.updateEmployeeData(empId);
+    try {
+        const { empId } = req.params;
+        const dayReport = await createOrUpdateDayReport();
+        const employee = await dayReport.toogleDayScheduleType(empId);
 
-    res.status(200).json({ employee });
+        res.status(200).json({ employee });
+    } catch (error) {
+        next(error);
+    }
 
 };
-const undoChekIn = async (req, res, next) => { };
+const undoChekIn = async (req, res, next) => {
+    try {
+        const { empId } = req.params;
+        const dayReport = await createOrUpdateDayReport();
+        const result = await dayReport.undoChekIn(empId);
 
-export { checkIn, changeDayScheduleType, undoChekIn };
+        res.status(200).json({ "message": "marked unpresent!" });
+    } catch (error) {
+        next(error);
+    }
+
+
+};
+const markLate = async (req, res, next) => {
+    try {
+        const { empId } = req.params;
+        const dayReport = await createOrUpdateDayReport();
+        const employee = await dayReport.toggleLate(empId);
+
+        res.status(200).json({ employee });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export { checkIn, changeDayScheduleType, undoChekIn, markLate };
