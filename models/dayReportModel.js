@@ -1,68 +1,53 @@
 import mongoose from "mongoose";
-
-const checkInSchema = mongoose.Schema({
-  employeeId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Employee",
-    required: true,
-  },
-  checkInTime: {
-    type: Date,
-    default: Date.now,
-  },
-  scheduleType: {
-    type: String,
-    enum: ["full", "half"],
-    default: "full",
-  },
-  isLate: {
-    type: Boolean,
-    default: false,
-  },
-});
+import Employee from "./employeeModel.js";
 
 const workdayStatusSchema = mongoose.Schema({
   date: {
     type: Date,
-    default: Date.now,
     unique: true,
   },
   checkIns: {
-    type: [mongoose.Schema.Types.ObjectId],
-    ref: "CheckIn",
+    type: [{
+      employeeId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Employee",
+        required: true,
+      },
+      checkInTime: {
+        type: Date,
+        default: null,
+      },
+      scheduleType: {
+        type: String,
+        enum: ["full", "half"],
+        default: null,
+      },
+      isPresent: {
+        type: Boolean,
+        default: false,
+      },
+      isLate: {
+        type: Boolean,
+        default: false,
+      },
+    }],
   },
 });
 
-workdayStatusSchema.methods.hasCheckInForEmployee = async function (
-  employeeId
-) {
-  const checkIns = await this.model("CheckIn").find({
-    _id: { $in: this.checkIns },
-  });
-  return checkIns.some((checkIn) => checkIn.employeeId.equals(employeeId));
+workdayStatusSchema.methods.hasCheckInForEmployee = function (employeeId) {
+  return this.checkIns.some(checkIn => checkIn.employeeId.equals(employeeId));
 };
 
-workdayStatusSchema.methods.getEmployeeCheckInData = async function (
-  employeeId
-) {
-  const checkIns = await this.model("CheckIn").find({
-    _id: { $in: this.checkIns },
-  });
-  return checkIns.find((checkIn) => checkIn.employeeId.equals(employeeId));
+workdayStatusSchema.methods.getEmployeeCheckInData = function (employeeId) {
+  return this.checkIns.find(checkIn => checkIn.employeeId.equals(employeeId));
 };
 
 workdayStatusSchema.methods.toggleScheduleType = async function (employeeId) {
-  const checkIns = await this.model("CheckIn").find({
-    _id: { $in: this.checkIns },
-  });
-  const checkInToUpdate = await checkIns.find((checkIn) =>
-    checkIn.employeeId.equals(employeeId)
-  );
+  const checkInToUpdate = this.checkIns.find(checkIn => checkIn.employeeId.equals(employeeId));
 
   if (checkInToUpdate) {
-    checkInToUpdate.scheduleType =
-      checkInToUpdate.scheduleType === "full" ? "half" : "full";
-    await checkInToUpdate.save();
+    checkInToUpdate.scheduleType = checkInToUpdate.scheduleType === "full" ? "half" : "full";
+    await this.save();
     return checkInToUpdate;
   } else {
     throw new Error("Check-in document not found for the provided employeeId");
@@ -70,74 +55,79 @@ workdayStatusSchema.methods.toggleScheduleType = async function (employeeId) {
 };
 
 workdayStatusSchema.methods.undoCheckIn = async function (employeeId) {
-  const checkIns = await this.model("CheckIn").find({
-    _id: { $in: this.checkIns },
-  });
-  const checkInToUpdate = checkIns.find((checkIn) =>
-    checkIn.employeeId.equals(employeeId)
-  );
-
+  const checkInToUpdate = this.checkIns.find(checkIn => checkIn.employeeId.equals(employeeId));
   if (checkInToUpdate) {
-    const removedCheckIn = await this.model("CheckIn").findByIdAndDelete(
-      checkInToUpdate._id
-    );
-
-    if (!removedCheckIn) {
-      throw new Error(
-        "Failed to remove the check-in document from the collection."
-      );
-    }
-
-    this.checkIns.pull(checkInToUpdate._id);
+    checkInToUpdate.isPresent = !checkInToUpdate.isPresent;
+    checkInToUpdate.checkInTime = null;
+    checkInToUpdate.scheduleType = null;
+    checkInToUpdate.isLate = false;
     await this.save();
-
-    return removedCheckIn;
+    return checkInToUpdate;
   } else {
     throw new Error("Check-in document not found for the provided employeeId");
   }
 };
-
-workdayStatusSchema.methods.toggleLate = async function (employeeId) {
-  const checkIns = await this.model("CheckIn").find({
-    _id: { $in: this.checkIns },
-  });
-  const checkInToUpdate = await checkIns.find((checkIn) =>
-    checkIn.employeeId.equals(employeeId)
-  );
-
+workdayStatusSchema.methods.checkIn = async function (employeeId) {
+  const checkInToUpdate = this.checkIns.find(checkIn => checkIn.employeeId.equals(employeeId));
   if (checkInToUpdate) {
-    checkInToUpdate.isLate = !checkInToUpdate.isLate;
-    await checkInToUpdate.save();
+    checkInToUpdate.isPresent = true;
+    checkInToUpdate.checkInTime = new Date;
+    checkInToUpdate.scheduleType = "full";
+    checkInToUpdate.isLate = false;
+    await this.save();
     return checkInToUpdate;
   } else {
     throw new Error("Check-in document not found for the provided employeeId");
   }
 };
 
-const createOrUpdateWorkdayStatus = async () => {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  let workdayStatus = await WorkdayStatus.findOne({ date: today });
+workdayStatusSchema.methods.toggleLate = async function (employeeId) {
+  const checkInToUpdate = this.checkIns.find(checkIn => checkIn.employeeId.equals(employeeId));
 
-  if (!workdayStatus) {
-    workdayStatus = new WorkdayStatus({ date: today });
+  if (checkInToUpdate) {
+    checkInToUpdate.isLate = !checkInToUpdate.isLate;
+    await this.save();
+    return checkInToUpdate;
+  } else {
+    throw new Error("Check-in document not found for the provided employeeId");
   }
-
-  return workdayStatus;
 };
+
+async function createOrUpdateWorkdayStatus() {
+  const currentDate = new Date();
+  currentDate.setHours(0, 0, 0, 0);
+
+  // Check if a workdayStatus document already exists for the current day
+  let existingWorkdayStatus = await WorkdayStatus.findOne({ date: currentDate });
+
+  if (!existingWorkdayStatus) {
+    // If no document exists, create a new one
+    existingWorkdayStatus = new WorkdayStatus({ date: currentDate });
+    // Retrieve all employee IDs from the Employee collection
+    const allEmployees = await Employee.find({}, '_id');
+
+    // Populate the checkIns array with employee IDs and default status
+    existingWorkdayStatus.checkIns = allEmployees.map(employee => ({
+      employeeId: employee._id,
+    }));
+
+    // Save the updated or new workdayStatus document
+    await existingWorkdayStatus.save();
+  }
+  return existingWorkdayStatus;
+}
 
 const addCheckInToWorkdayStatus = async (checkInData) => {
   const workdayStatus = await createOrUpdateWorkdayStatus();
-  workdayStatus.checkIns.push(checkInData._id);
+  workdayStatus.checkIns.push(checkInData);
   await workdayStatus.save();
 };
 
 const WorkdayStatus = mongoose.model("WorkdayStatus", workdayStatusSchema);
-const CheckIn = mongoose.model("CheckIn", checkInSchema);
+
 
 export {
   WorkdayStatus,
-  CheckIn,
   createOrUpdateWorkdayStatus,
   addCheckInToWorkdayStatus,
 };

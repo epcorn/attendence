@@ -100,20 +100,38 @@ const logout = async (req, res, next) => {
   }
 };
 const allEmployee = async (req, res, next) => {
-  const employees = await Employee.find();
-  const empArray = employees.map((emp) => ({
-    firstname: emp.firstname,
-    lastname: emp.lastname,
-    email: emp.email,
-    phone: emp.phone,
-    category: emp.category,
-    division: emp.division,
-    company: emp.company,
-  }));
-  res.status(200).json({ empArray });
+  try {
+    const employees = await Employee.find();
+    const empArray = employees.map((emp) => ({
+      firstname: emp.firstname,
+      lastname: emp.lastname,
+      email: emp.email,
+      phone: emp.phone,
+      category: emp.category,
+      division: emp.division,
+      company: emp.company,
+    }));
+    res.status(200).json({ empArray });
+  } catch (error) {
+    next(error);
+  }
 };
-const updateEmployee = async (req, res, next) => {};
-const deleteEmployee = async (req, res, next) => {};
+
+const empDetails = async (req, res, next) => {
+  try {
+    const { empId } = req.params;
+    const employee = await Employee.findById(empId);
+    if (!employee) {
+      return res.status(404).json({ "message": "No such employee" });
+    }
+    res.status(200).json(employee);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const updateEmployee = async (req, res, next) => { };
+const deleteEmployee = async (req, res, next) => { };
 
 export {
   login,
@@ -122,6 +140,7 @@ export {
   newEmployee,
   logout,
   allEmployee,
+  empDetails,
   deleteEmployee,
   updateEmployee,
 };
