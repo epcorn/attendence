@@ -97,21 +97,18 @@ async function createOrUpdateWorkdayStatus() {
   const currentDate = new Date();
   currentDate.setHours(0, 0, 0, 0);
 
-  // Check if a workdayStatus document already exists for the current day
   let existingWorkdayStatus = await WorkdayStatus.findOne({ date: currentDate });
 
   if (!existingWorkdayStatus) {
-    // If no document exists, create a new one
+
     existingWorkdayStatus = new WorkdayStatus({ date: currentDate });
-    // Retrieve all employee IDs from the Employee collection
+
     const allEmployees = await Employee.find({}, '_id');
 
-    // Populate the checkIns array with employee IDs and default status
     existingWorkdayStatus.checkIns = allEmployees.map(employee => ({
       employeeId: employee._id,
     }));
 
-    // Save the updated or new workdayStatus document
     await existingWorkdayStatus.save();
   }
   return existingWorkdayStatus;
