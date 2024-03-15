@@ -7,8 +7,7 @@ function createToken(employee) {
         id: employee._id,
         isAdmin: employee.isAdmin,
         isOprator: employee.isOprator,
-        created_on: new Date()
-    }, "abc");
+    }, process.env.JWT_SECRET);
 
     return token;
 }

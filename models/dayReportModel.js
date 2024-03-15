@@ -4,7 +4,6 @@ import Employee from "./employeeModel.js";
 const workdayStatusSchema = mongoose.Schema({
   date: {
     type: Date,
-    unique: true,
   },
   checkIns: {
     type: [{

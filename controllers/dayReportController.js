@@ -25,6 +25,7 @@ const toogleCheckIn = async (req, res, next) => {
   try {
     const { empId } = req.params;
     const workdayStatus = await createOrUpdateWorkdayStatus();
+    console.log(workdayStatus);
     const obj = workdayStatus.checkIns.find(checkIn => checkIn.employeeId.equals(empId));
     if (obj.isPresent) {
       const result = await workdayStatus.undoCheckIn(empId);

@@ -1,4 +1,4 @@
-import errorMiddleware from "../middleware/errorMiddleware.js";
+import { errorHandler } from '../utils/error.js';
 import Employee from "../models/employeeModel.js";
 import { createToken } from "../utils/createToken.js";
 
@@ -11,11 +11,11 @@ const login = async (req, res, next) => {
   try {
     const employee = await Employee.findOne({ email });
     if (!employee) {
-      return next(errorMiddleware(404, "Employee not found!"));
+      return next(errorHandler(404, "Employee not found!"));
     }
     const validEmployee = await employee.comparePassword(password);
     if (!validEmployee) {
-      return next(errorMiddleware(400, "Invalid credential"));
+      return next(errorHandler(400, "Invalid credential"));
     }
     const token = createToken(employee);
 
@@ -94,7 +94,7 @@ const logout = async (req, res, next) => {
     res
       .clearCookie("access_token")
       .status(200)
-      .json("User have been signed out");
+      .json({ "message": "User have been signed out" });
   } catch (error) {
     next(error);
   }

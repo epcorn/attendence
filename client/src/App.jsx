@@ -1,8 +1,8 @@
-import MyPage from './components/MyPage';
+import Login from './pages/Login';
 
 function App() {
   return (
-    <MyPage />
+    <Login />
   );
 }
 
