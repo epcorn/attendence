@@ -26,9 +26,12 @@ export const login = createAsyncThunk('login', async (data, { rejectWithValue })
         return rejectWithValue(error.response.data);
     }
 });
-export const logout = createAsyncThunk('logout', async (data, { rejectWithValue }) => {
+export const logout = createAsyncThunk('logout', async ({ rejectWithValue }) => {
     try {
-        const response = await fetch("", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) });
+        const response = await fetch("http://localhost:3000/api/v1/employee/logout", {
+            method: "POST",
+        });
+
         const result = await response.json();
         return result;
     } catch (error) {
@@ -63,17 +66,18 @@ export const userSlice = createSlice({
             })
             .addCase(login.rejected, (state, action) => {
                 state.loading = false;
-                state.error = action.payload.message;
+                state.error = action.payload;
             })
             .addCase(logout.fulfilled, (state) => {
                 state.loading = false;
+                state.currentUser = null;
             })
             .addCase(logout.pending, (state) => {
                 state.loading = true;
             })
             .addCase(logout.rejected, (state, action) => {
                 state.loading = false;
-                state.error = action.payload.message;
+                state.error = action.payload;
             });
     },
 });

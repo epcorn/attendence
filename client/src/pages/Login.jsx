@@ -1,21 +1,34 @@
 import { useSelector, useDispatch } from "react-redux";
-import { Button } from "flowbite-react";
 import { login } from "../redux/user/userSlice";
-import { useState } from 'react';
-import { ToastContainer } from "react-toastify";
+import { useEffect, useState } from 'react';
 import "react-toastify/dist/ReactToastify.css";
+import { useNavigate } from 'react-router-dom';
+import { Spinner } from 'flowbite-react';
 
 const Login = () => {
-    const { loading } = useSelector(
+    const navigate = useNavigate();
+    const { currentUser, loading } = useSelector(
         (store) => store.user
     );
     const dispatch = useDispatch();
+
+    useEffect(() => {
+        if (currentUser) {
+            setTimeout(() => {
+                navigate("/dashboard");
+            }, 500);
+        }
+        // eslint-disable-next-line
+    }, [currentUser]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
         dispatch(login(loginData));
     };
-    const [loginData, setLoginData] = useState({});
+    const [loginData, setLoginData] = useState({
+        email: "",
+        password: ""
+    });
 
 
     function handleChange(e) {
@@ -23,43 +36,52 @@ const Login = () => {
     }
 
     return (
-        <div className="container">
-            <ToastContainer
-                position="top-center"
-                autoClose={2000}
-                pauseOnFocusLoss={false}
-            />
-            <form onSubmit={handleSubmit}>
-                <div className="row d-flex flex-column page mx-2 justify-content-center align-items-center">
-                    <div className="col-lg-4">
+        <div className='w-full h-screen flex items-center justify-center'>
+            <div className='flex flex-col items-center justify-center border border-sky-400 w-96 h-96 '>
+                <h1 className=' text-3xl mb-4  font-bold ' >Login</h1>
+                <form onSubmit={handleSubmit}>
+                    <div className="">
+                        <label htmlFor="email" className="block mb-2 font-bold text-blue-600">Enter Email</label>
                         <input
-                            label="Email:"
                             type="email"
-                            name="email"
-                            value={loginData?.email}
+                            id="email"
+                            name='email'
+                            value={loginData.email}
+                            className="w-full px-3 py-2 border rounded-md"
+                            placeholder="Email..."
                             onChange={(e) => handleChange(e)}
+
                         />
                     </div>
-                    <div className="col-lg-4">
+                    <div className="">
+                        <label htmlFor="password" className="block mb-2 font-bold text-blue-600">Password</label>
                         <input
-                            label="Password:"
                             type="password"
-                            name="password"
-                            value={loginData?.password}
+                            id="password"
+                            name='password'
+                            value={loginData.password}
                             onChange={(e) => handleChange(e)}
+                            className="w-full px-3 py-2 border rounded-md"
+                            placeholder="********"
                         />
                     </div>
-                    <div className="col-md-4 mt-2">
-                        <Button
-                            className="btn btn-primary"
-                            type="submit"
-                            disabled={loading ? true : false}
-                        >
-                            Login
-                        </Button>
-                    </div>
-                </div>
-            </form>
+                    <button
+                        className='bg-blue-500 hover:bg-blue-400 text-white font-semibold mt-2 px-8 py-2 rounded-md'
+                        type="submit"
+                        disabled={loading}
+                    >
+                        {loading ? (
+                            <>
+                                <span className=" pr-3">Loading...</span>
+                                <Spinner size="sm" />
+                            </>
+                        ) : (
+                            "Login"
+                        )}
+                    </button>
+
+                </form>
+            </div>
         </div>
     );
 };
