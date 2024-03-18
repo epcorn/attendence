@@ -2,18 +2,19 @@ import {
   createOrUpdateWorkdayStatus,
   WorkdayStatus,
 } from "../models/dayReportModel.js";
-import { errorHandler } from '../utils/error.js';
 
 const todaysStatus = async (req, res, next) => {
   try {
-    let dateVal = new Date(req.body.date);
-    dateVal.setHours(0, 0, 0, 0);
+    console.log(req.body);
+    let { date } = req.body;
+    date.setHours(0, 0, 0, 0);
+    console.log(date);
     if (!dateVal) {
       return res.status(404).json({ "message": "bad request" });
     }
 
     // Query for documents with date falling within the specified range
-    const workdayStatus = await WorkdayStatus.find({ date: dateVal });
+    const workdayStatus = await WorkdayStatus.find({ date });
     res.status(200).json({ "message": "Todays day Status", workdayStatus });
   } catch (error) {
     next(error);
@@ -50,7 +51,7 @@ const changeDayScheduleType = async (req, res, next) => {
     } else {
       return res.status(400).json({ "message": "User not present" });
     }
-    res.status(200).json({ employee });
+
   } catch (error) {
     next(error);
   }

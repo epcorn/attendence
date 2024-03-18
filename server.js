@@ -20,5 +20,5 @@ app.use("/api/v1", rootRouter);
 //Error handling middleware
 app.use(errorMiddleware);
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 5000;
 app.listen(port, () => console.log(`Server running at port: ${port}`));

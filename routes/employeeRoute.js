@@ -1,10 +1,10 @@
 import { Router } from "express";
 import {
   login,
+  logout,
   setAdmin,
   setOprator,
   newEmployee,
-  logout,
   allEmployee,
   updateEmployee,
   deleteEmployee,

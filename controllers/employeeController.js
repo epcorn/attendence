@@ -1,6 +1,6 @@
 import { errorHandler } from '../utils/error.js';
 import Employee from "../models/employeeModel.js";
-import { createToken } from "../utils/createToken.js";
+import { createToken } from "../middleware/verifyUser.js";
 
 const login = async (req, res, next) => {
   const { email, password } = req.body;
@@ -22,7 +22,17 @@ const login = async (req, res, next) => {
     res
       .status(200)
       .cookie("access_token", token, { httpOnly: true })
-      .json({ message: `Hello ${employee.firstname}`, user: employee });
+      .json({ message: `Hello ${employee.firstname}`, user: employee, token });
+  } catch (error) {
+    next(error);
+  }
+};
+const logout = async (req, res, next) => {
+  try {
+    res
+      .clearCookie("access_token")
+      .status(200)
+      .json("User have been signed out");
   } catch (error) {
     next(error);
   }
@@ -89,16 +99,7 @@ const newEmployee = async (req, res, next) => {
     next(error);
   }
 };
-const logout = async (req, res, next) => {
-  try {
-    res
-      .clearCookie("access_token")
-      .status(200)
-      .json({ "message": "User have been signed out" });
-  } catch (error) {
-    next(error);
-  }
-};
+
 const allEmployee = async (req, res, next) => {
   try {
     const employees = await Employee.find();
@@ -138,9 +139,9 @@ export {
   setAdmin,
   setOprator,
   newEmployee,
-  logout,
   allEmployee,
   empDetails,
   deleteEmployee,
   updateEmployee,
+  logout,
 };

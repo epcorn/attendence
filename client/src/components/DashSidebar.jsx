@@ -32,7 +32,7 @@ export default function DashSidebar() {
         <Sidebar className="w-full wd:w-56">
             <Sidebar.Items>
                 <Sidebar.ItemGroup className="flex flex-col gap-1">
-                    {currentUser.isAdmin && (
+                    {currentUser.role === "admin" && (
                         <Link to="/dashboard?tab=dash">
                             <Sidebar.Item
                                 active={tab === "dash" || !tab}
@@ -47,14 +47,14 @@ export default function DashSidebar() {
                         <Sidebar.Item
                             active={tab === "profile"}
                             icon={HiArrowCircleRight}
-                            label={currentUser.isAdmin ? "Admin" : "User"}
+                            label={currentUser.role === "admin" ? "Admin" : currentUser.role === "oprator" ? "Oprator" : "Employee"}
                             labelColor="dark"
                             as="div"
                         >
                             Profile
                         </Sidebar.Item>
                     </Link>
-                    {currentUser.isAdmin && (
+                    {currentUser.role === "admin" && (
                         <Link to="/dashboard?tab=attendence">
                             <Sidebar.Item
                                 active={tab === "attendence"}
@@ -65,7 +65,7 @@ export default function DashSidebar() {
                             </Sidebar.Item>
                         </Link>
                     )}
-                    {currentUser.isAdmin && (
+                    {currentUser.role === "admin" && (
                         <Link to="/dashboard?tab=employee">
                             <Sidebar.Item
                                 active={tab === "Employee"}

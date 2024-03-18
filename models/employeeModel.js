@@ -19,13 +19,10 @@ const employeeSchema = new mongoose.Schema({
   password: {
     type: String,
   },
-  isAdmin: {
-    type: Boolean,
-    default: false,
-  },
-  isOprator: {
-    type: Boolean,
-    default: false,
+  role: {
+    type: String,
+    enum: ["admin", "oprator"],
+    default: null
   },
   category: {
     type: String,

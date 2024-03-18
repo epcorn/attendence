@@ -1,6 +1,16 @@
 import jwt from "jsonwebtoken";
 import { errorHandler } from "../utils/error.js";
 
+function createToken(employee) {
+    let date = new Date().toISOString().split("T")[0];
+    const token = jwt.sign({
+        id: employee._id,
+        role: employee.role,
+    }, process.env.JWT_SECRET);
+
+    return token;
+}
+
 const verifyToken = (req, res, next) => {
     const token = req.cookies.access_token;
     if (!token) {
@@ -17,24 +27,17 @@ const verifyToken = (req, res, next) => {
 };
 
 const ifAdmin = (req, res, next) => {
-    if (!req.user.isAdmin) {
-        return next(errorHandler(403, "Forbidden"));
+    if (!req.user.role !== "admin") {
+        return next(errorHandler(408, "Forbidden"));
     }
     next();
 };
 const ifOprator = (req, res, next) => {
-    if (!req.user.isOprator) {
+    if (!req.user.role !== "oprator") {
         return next(errorHandler(403, "Forbidden"));
     }
     next();
 };
 
-const ifOpratorOrAdmin = (req, res, next) => {
-    if (!req.user.isAdmin && !req.user.isOprator) {
-        return next(errorHandler(403, "Forbidden"));
-    }
-    next();
-};
-
-export { verifyToken, ifAdmin, ifOprator, ifOpratorOrAdmin }
+export { verifyToken, ifAdmin, ifOprator, createToken }
 

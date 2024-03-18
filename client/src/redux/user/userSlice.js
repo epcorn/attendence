@@ -26,7 +26,8 @@ export const login = createAsyncThunk('login', async (data, { rejectWithValue })
         return rejectWithValue(error.response.data);
     }
 });
-export const logout = createAsyncThunk('logout', async ({ rejectWithValue }) => {
+export const logout = createAsyncThunk('logout', async (data, { rejectWithValue }) => {
+    console.log("hi");
     try {
         const response = await fetch("http://localhost:3000/api/v1/employee/logout", {
             method: "POST",

@@ -1,7 +1,9 @@
 
+import DatePicker from './DatePicker';
 function Attendence() {
+
     return (
-        <div>Attendence</div>
+        < DatePicker />
     );
 }
 
