@@ -5,28 +5,50 @@ import {
 
 const todaysStatus = async (req, res, next) => {
   try {
-    console.log(req.body);
-    let { date } = req.body;
-    date.setHours(0, 0, 0, 0);
-    console.log(date);
-    if (!dateVal) {
-      return res.status(404).json({ "message": "bad request" });
+    const { date } = req.body;
+
+    if (!date) {
+      return res.status(400).json({ message: "Bad request: date is missing" });
     }
 
-    // Query for documents with date falling within the specified range
-    const workdayStatus = await WorkdayStatus.find({ date });
-    res.status(200).json({ "message": "Todays day Status", workdayStatus });
+    const todayIs = new Date();
+    todayIs.setUTCHours(0, 0, 0, 0);
+
+    // Convert both dates to milliseconds since January 1, 1970
+    const todayIsTimestamp = todayIs.getTime();
+    const dateTimestamp = new Date(date).getTime();
+
+    if (todayIsTimestamp < dateTimestamp) {
+      return res.status(403).json({ message: "The provided date is in the future", date });
+    }
+
+    if (todayIsTimestamp === dateTimestamp) {
+      let workdayStatus = await WorkdayStatus.find({ date });
+      if (workdayStatus.length === 0) {
+        workdayStatus = await createOrUpdateWorkdayStatus();
+      }
+      const { checkIns, ...rest } = workdayStatus;
+      return res.status(200).json({ message: "Today's day Status", "workdayStatus": workdayStatus[0], date });
+    }
+
+    if (todayIsTimestamp > dateTimestamp) {
+      const workdayStatus = await WorkdayStatus.find({ date });
+      console.log(workdayStatus);
+      if (workdayStatus.length <= 0) {
+        return res.status(404).json({ message: "We do not have that old Data", date });
+      }
+      return res.status(200).json({ message: "Old Status", workdayStatus, date });
+    }
   } catch (error) {
     next(error);
   }
-
 };
+
 
 const toogleCheckIn = async (req, res, next) => {
   try {
     const { empId } = req.params;
     const workdayStatus = await createOrUpdateWorkdayStatus();
-    console.log(workdayStatus);
     const obj = workdayStatus.checkIns.find(checkIn => checkIn.employeeId.equals(empId));
     if (obj.isPresent) {
       const result = await workdayStatus.undoCheckIn(empId);

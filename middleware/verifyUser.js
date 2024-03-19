@@ -33,8 +33,9 @@ const ifAdmin = (req, res, next) => {
     next();
 };
 const ifOprator = (req, res, next) => {
+    console.log(req.user.role);
     if (!req.user.role !== "oprator") {
-        return next(errorHandler(403, "Forbidden"));
+        return next(errorHandler(403, "Not oprator"));
     }
     next();
 };

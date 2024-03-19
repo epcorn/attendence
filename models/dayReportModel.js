@@ -19,7 +19,7 @@ const workdayStatusSchema = mongoose.Schema({
       scheduleType: {
         type: String,
         enum: ["full", "half"],
-        default: null,
+        default: "full",
       },
       isPresent: {
         type: Boolean,
@@ -56,7 +56,7 @@ workdayStatusSchema.methods.toggleScheduleType = async function (employeeId) {
 workdayStatusSchema.methods.undoCheckIn = async function (employeeId) {
   const checkInToUpdate = this.checkIns.find(checkIn => checkIn.employeeId.equals(employeeId));
   if (checkInToUpdate) {
-    checkInToUpdate.isPresent = !checkInToUpdate.isPresent;
+    checkInToUpdate.isPresent = false;
     checkInToUpdate.checkInTime = null;
     checkInToUpdate.scheduleType = null;
     checkInToUpdate.isLate = false;
@@ -94,7 +94,7 @@ workdayStatusSchema.methods.toggleLate = async function (employeeId) {
 
 async function createOrUpdateWorkdayStatus() {
   const currentDate = new Date();
-  currentDate.setHours(0, 0, 0, 0);
+  currentDate.setUTCHours(0, 0, 0, 0);
 
   let existingWorkdayStatus = await WorkdayStatus.findOne({ date: currentDate });
 

@@ -54,7 +54,7 @@ export default function DashSidebar() {
                             Profile
                         </Sidebar.Item>
                     </Link>
-                    {currentUser.role === "admin" && (
+                    {currentUser.role === "oprator" && (
                         <Link to="/dashboard?tab=attendence">
                             <Sidebar.Item
                                 active={tab === "attendence"}

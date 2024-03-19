@@ -1,29 +1,34 @@
 import { useEffect, useState } from 'react';
 import { workdayStatus } from '../redux/attendence/attendenceSlice';
 import { useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
+
 function DatePicker() {
-    const [selectedDate, setSelectedDate] = useState('');
+    const [selectedDate, setSelectedDate] = useState();
+    const [date, setDate] = useState(useSelector(state => state.dayStat.date));
     const dispatch = useDispatch();
 
     const handleDateChange = (e) => {
-        const selectedDate = e.target.value;
-        setSelectedDate(selectedDate);
+        const tempDate = e.target.value;
+        console.log(tempDate);
+        setDate(tempDate);
+        setSelectedDate(formatDate(tempDate));
+
     };
     useEffect(() => {
-        dispatch(workdayStatus(selectedDate));
+        if (selectedDate !== undefined) {
+            dispatch(workdayStatus(selectedDate));
+        }
     }, [dispatch, selectedDate]);
 
     const formatDate = (date) => {
         const formattedDate = new Date(date).toISOString();
         return formattedDate;
     };
-
+    console.log(selectedDate);
     return (
-        <div>
-            <input type="date" value={selectedDate} onChange={handleDateChange} />
-            {selectedDate && (
-                <p>Selected Date (ISO 8601 format): {formatDate(selectedDate)}</p>
-            )}
+        <div className='mr-3'>
+            <input type="date" value={date} onChange={handleDateChange} />
         </div>
     );
 }
