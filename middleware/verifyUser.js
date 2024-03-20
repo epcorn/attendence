@@ -27,14 +27,14 @@ const verifyToken = (req, res, next) => {
 };
 
 const ifAdmin = (req, res, next) => {
-    if (!req.user.role !== "admin") {
-        return next(errorHandler(408, "Forbidden"));
+    if (req.user.role !== "admin") {
+        return next(errorHandler(403, "Forbidden"));
     }
     next();
 };
 const ifOprator = (req, res, next) => {
     console.log(req.user.role);
-    if (!req.user.role !== "oprator") {
+    if (req.user.role !== "oprator") {
         return next(errorHandler(403, "Not oprator"));
     }
     next();

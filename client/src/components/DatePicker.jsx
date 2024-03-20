@@ -4,16 +4,21 @@ import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
 
 function DatePicker() {
-    const [selectedDate, setSelectedDate] = useState();
-    const [date, setDate] = useState(useSelector(state => state.dayStat.date));
+    const initialDate = useSelector(state => state.dayStat.date);
+
+    const [date, setDate] = useState(
+        initialDate !== ""
+            ? initialDate
+            : new Date().toISOString().split("T")[0]
+    );
+
+    const [selectedDate, setSelectedDate] = useState(date);
     const dispatch = useDispatch();
 
     const handleDateChange = (e) => {
         const tempDate = e.target.value;
-        console.log(tempDate);
         setDate(tempDate);
         setSelectedDate(formatDate(tempDate));
-
     };
     useEffect(() => {
         if (selectedDate !== undefined) {
@@ -21,11 +26,11 @@ function DatePicker() {
         }
     }, [dispatch, selectedDate]);
 
-    const formatDate = (date) => {
+    function formatDate(date) {
         const formattedDate = new Date(date).toISOString();
         return formattedDate;
-    };
-    console.log(selectedDate);
+    }
+
     return (
         <div className='mr-3'>
             <input type="date" value={date} onChange={handleDateChange} />

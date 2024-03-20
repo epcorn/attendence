@@ -1,14 +1,12 @@
 import { Avatar, Dropdown, Navbar } from "flowbite-react";
 import { useSelector, useDispatch } from "react-redux";
-import { Link, NavLink, useLocation } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { IoFingerPrint } from "react-icons/io5";
 import { logout } from '../redux/user/userSlice';
 
 export default function Header() {
     const { currentUser } = useSelector((state) => state.user);
     const dispatch = useDispatch();
-    const location = useLocation();
-    const path = location.pathname;
 
     const handleSignout = async () => {
         dispatch(logout());
@@ -36,10 +34,8 @@ export default function Header() {
                         }
                     >
                         <Dropdown.Header>
-                            <span className="block text-sm">{currentUser?.username}</span>
-                            <span className="block truncate text-sm font-medium">
-                                {currentUser?.email}
-                            </span>
+                            <span className="block text-sm">{`${currentUser?.firstname} ${currentUser?.lastname}`}</span>
+
                         </Dropdown.Header>
                         <Link to="/dashboard?tab=settings">
                             <Dropdown.Item>Settings</Dropdown.Item>
@@ -56,13 +52,6 @@ export default function Header() {
                 </Navbar.Collapse>
             ) : (
                 <Navbar.Collapse>
-                    <Link to="/">
-                        <Navbar.Link active={path === "/"} as="div">
-                            Home
-                        </Navbar.Link>
-                    </Link>
-                    <Navbar.Link as={"div"}>Contact</Navbar.Link>
-                    <Navbar.Link as={"div"}>About</Navbar.Link>
                 </Navbar.Collapse>
             )}
         </Navbar>

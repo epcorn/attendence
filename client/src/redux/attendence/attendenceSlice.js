@@ -22,7 +22,6 @@ export const workdayStatus = createAsyncThunk(
         }
       );
       const result = await response.json();
-      console.log(result);
       return result;
     } catch (error) {
       console.log(error);
@@ -40,7 +39,6 @@ export const togglePresence = createAsyncThunk(
         { method: "POST", headers: { "Content-Type": "application/json" } }
       );
       const result = await response.json();
-      console.log(result.result);
       return result;
     } catch (error) {
       console.log(error);
@@ -58,7 +56,6 @@ export const toggleLateness = createAsyncThunk(
         { method: "POST", headers: { "Content-Type": "application/json" } }
       );
       const result = await response.json();
-      console.log(result.result);
       return result;
     } catch (error) {
       console.log(error);
@@ -80,7 +77,6 @@ export const dayTypeness = createAsyncThunk(
       );
 
       const result = await response.json();
-      console.log(result.result);
       return result;
     } catch (error) {
       console.log(error);
