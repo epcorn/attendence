@@ -13,9 +13,8 @@ router.post("/checkIn/:empId", verifyToken, toogleCheckIn);
 router.post(
   "/changeDayScheduleType/:empId",
   verifyToken,
-  ifOprator,
   changeDayScheduleType
 );
-router.post("/markLate/:empId", verifyToken, ifOprator, markLate);
+router.post("/markLate/:empId", verifyToken, markLate);
 
 export default router;

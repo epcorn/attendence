@@ -47,7 +47,7 @@ const todaysStatus = async (req, res, next) => {
       }
       return res
         .status(200)
-        .json({ message: "Old Status", workdayStatus, date });
+        .json({ message: "Old Status", workdayStatus: workdayStatus[0], date });
     }
   } catch (error) {
     next(error);
@@ -76,12 +76,14 @@ const toogleCheckIn = async (req, res, next) => {
 const changeDayScheduleType = async (req, res, next) => {
   try {
     const { empId } = req.params;
+    const { type } = req.body;
+    console.log(req.body);
     const workdayStatus = await createOrUpdateWorkdayStatus();
     const obj = workdayStatus.checkIns.find((checkIn) =>
       checkIn.employeeId.equals(empId)
     );
     if (obj.isPresent) {
-      const result = await workdayStatus.toggleScheduleType(empId);
+      const result = await workdayStatus.toggleScheduleType(empId, type);
       return res.status(200).json({ message: "Sechedule changed!", result });
     } else {
       return res.status(400).json({ message: "User not present" });
@@ -102,7 +104,7 @@ const markLate = async (req, res, next) => {
       const result = await workdayStatus.toggleLate(empId);
       return res.status(200).json({ message: "User marked late", result });
     } else {
-      return res.status(400).json({ message: "User not present" });
+      return res.status(200).json({ message: "User not present" });
     }
   } catch (error) {
     next(error);

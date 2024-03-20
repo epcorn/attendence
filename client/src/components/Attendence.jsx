@@ -1,27 +1,34 @@
-import { Button, Checkbox, Table, TextInput } from 'flowbite-react';
+import { Button, Checkbox, Select, Table, TextInput } from 'flowbite-react';
 import DatePicker from './DatePicker';
 import { useSelector } from 'react-redux';
 import { AiOutlineSearch } from "react-icons/ai";
 import { useState } from 'react';
 import Loading from './Loading';
 import { useDispatch } from 'react-redux';
-import { togglePresence } from '../redux/attendence/attendenceSlice';
+import { dayTypeness, toggleLateness, togglePresence } from '../redux/attendence/attendenceSlice';
 
 function Attendence() {
     const { currentUser } = useSelector(state => state.user);
     const { workdayStatus, loading } = useSelector(state => state.dayStat);
     const [searchTerm, setSearchTerm] = useState("");
     const dispatch = useDispatch();
+
     function handleSubmit() {
         console.log(searchTerm);
     }
 
-    const handleClick = (employeeId, isPresent) => {
-        // Dispatch the togglePresence action with the employeeId and isPresent value
-        console.log(employeeId);
-        console.log(isPresent);
+    const handleClick = (employeeId) => {
         dispatch(togglePresence(employeeId));
     };
+
+    function handleLateness(id) {
+        dispatch(toggleLateness(id));
+    }
+
+    function handleType(e, id) {
+        const type = e.target.value;
+        dispatch(dayTypeness({ id, type }));
+    }
     return (
         <div className='flex-col mt-2 mx-auto '>
             {loading && <Loading />}
@@ -59,13 +66,19 @@ function Attendence() {
                                         <Table.Cell>
                                             {new Date(employee.checkInTime).toLocaleTimeString()}
                                         </Table.Cell>
-                                        <Table.Cell>{employee.scheduleType}</Table.Cell>
                                         <Table.Cell>
-                                            <Button className={employee.isLate ? " bg-red-400" : "bg-green-400"}>{employee.isLate ? "Late" : "No"}</Button>
+                                            <Select id="type" value={employee.scheduleType} onChange={(e) => handleType(e, employee.employeeId)}>
+                                                <option value="full">full</option>
+                                                <option value="half">half</option>
+                                            </Select>
+                                        </Table.Cell>
+                                        <Table.Cell>
+                                            <Button onClick={() => handleLateness(employee.employeeId)} className={` w-14 ${employee.isLate ? " bg-red-400" : "bg-green-400"}`}>{employee.isLate ? "Late" : "No"}</Button>
                                         </Table.Cell>
                                         <Table.Cell>
                                             <Checkbox
                                                 value={employee.isPresent}
+                                                defaultChecked={employee.isPresent}
                                                 onClick={(e) => handleClick(employee.employeeId, e.target.checked)} // Pass employeeId and checked state to handleClick
                                             />
                                         </Table.Cell>

@@ -32,7 +32,7 @@ export const workdayStatus = createAsyncThunk(
 );
 
 export const togglePresence = createAsyncThunk(
-  "markPresent",
+  "presence",
   async (id, { rejectWithValue }) => {
     try {
       const response = await fetch(
@@ -48,6 +48,45 @@ export const togglePresence = createAsyncThunk(
     }
   }
 );
+
+export const toggleLateness = createAsyncThunk(
+  "lateness",
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await fetch(
+        `http://localhost:3000/api/v1/dayReport/markLate/${id}`,
+        { method: "POST", headers: { "Content-Type": "application/json" } }
+      );
+      const result = await response.json();
+      console.log(result.result);
+      return result;
+    } catch (error) {
+      console.log(error);
+      return rejectWithValue(error);
+    }
+  });
+
+export const dayTypeness = createAsyncThunk(
+  "dayTypeness",
+  async ({ id, type }, { rejectWithValue }) => {
+    try {
+      const response = await fetch(
+        `http://localhost:3000/api/v1/dayReport/changeDayScheduleType/${id}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ type }) // Stringify the whole body object
+        }
+      );
+
+      const result = await response.json();
+      console.log(result.result);
+      return result;
+    } catch (error) {
+      console.log(error);
+      return rejectWithValue(error);
+    }
+  });
 
 export const attendenceSlice = createSlice({
   name: "attendence",
@@ -85,6 +124,38 @@ export const attendenceSlice = createSlice({
       })
       .addCase(togglePresence.pending, (state) => {
         state.loading = true;
+      })
+      .addCase(togglePresence.rejected, (state, action) => {
+        state.loading = true;
+        toast.success(action.payload.message, { autoClose: 1000 });
+      })
+      .addCase(toggleLateness.fulfilled, (state, action) => {
+        state.loading = false;
+        const index = state.workdayStatus.findIndex(item => item.employeeId === action.payload.result.employeeId);
+        if (index !== -1) {
+          state.workdayStatus[index] = action.payload.result;
+        }
+      })
+      .addCase(toggleLateness.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(toggleLateness.rejected, (state, action) => {
+        state.loading = false;
+        toast.success(action.payload.message, { autoClose: 1000 });
+      })
+      .addCase(dayTypeness.fulfilled, (state, action) => {
+        state.loading = false;
+        const index = state.workdayStatus.findIndex(item => item.employeeId === action.payload.result.employeeId);
+        if (index !== -1) {
+          state.workdayStatus[index] = action.payload.result;
+        }
+      })
+      .addCase(dayTypeness.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(dayTypeness.rejected, (state, action) => {
+        state.loading = false;
+        toast.success(action.payload, { autoClose: 1000 });
       })
       .addCase(logout.fulfilled, () => {
         // Reset attendance state here

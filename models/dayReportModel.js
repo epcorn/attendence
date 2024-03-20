@@ -41,11 +41,11 @@ workdayStatusSchema.methods.getEmployeeCheckInData = function (employeeId) {
   return this.checkIns.find(checkIn => checkIn.employeeId.equals(employeeId));
 };
 
-workdayStatusSchema.methods.toggleScheduleType = async function (employeeId) {
+workdayStatusSchema.methods.toggleScheduleType = async function (employeeId, type) {
   const checkInToUpdate = this.checkIns.find(checkIn => checkIn.employeeId.equals(employeeId));
 
   if (checkInToUpdate) {
-    checkInToUpdate.scheduleType = checkInToUpdate.scheduleType === "full" ? "half" : "full";
+    checkInToUpdate.scheduleType = type;
     await this.save();
     return checkInToUpdate;
   } else {
