@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import path from "path";
 import cookieParser from 'cookie-parser';
 import rootRouter from "./routes/index.js";
 import connectDB from "./config/mongoose.js";
