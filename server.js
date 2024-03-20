@@ -11,6 +11,7 @@ const app = express();
 
 //Root Middleware
 app.use(cors());
+
 app.use(express.json());
 app.use(cookieParser());
 
