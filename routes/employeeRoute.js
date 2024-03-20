@@ -18,7 +18,7 @@ router.post("/setOprator/:empId", verifyToken, ifAdmin, setOprator);
 router.post("/new", newEmployee);
 router.post("/logout", verifyToken, logout);
 
-router.get("/", verifyToken, ifOprator, allEmployee);
+router.get("/", verifyToken, ifAdmin, allEmployee);
 
 router.post("/:empId", verifyToken, ifAdmin, updateEmployee);
 router.delete("/:empId", verifyToken, ifAdmin, deleteEmployee);

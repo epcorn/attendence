@@ -4,10 +4,12 @@ import { persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 import persistStore from "redux-persist/es/persistStore";
 import attendenceReducer from "./attendence/attendenceSlice";
+import employeeReducer from "./employee/employeeSlice";
 
 const rootReducer = combineReducers({
     user: userReducer,
     dayStat: attendenceReducer,
+    workers: employeeReducer,
 });
 const persistConfig = {
     key: "root",
