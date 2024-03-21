@@ -93,9 +93,8 @@ function Attendence() {
                                         <Table.Cell>
                                             <Checkbox
                                                 disabled={block}
-                                                value={employee.isPresent}
-                                                defaultChecked={employee.isPresent}
-                                                onClick={(e) => handleClick(employee.employeeId, e.target.checked)} // Pass employeeId and checked state to handleClick
+                                                checked={employee.isPresent} // Use checked instead of value and defaultChecked
+                                                onChange={(e) => handleClick(employee.employeeId, e.target.checked)} // Use onChange instead of onClick for checkboxes
                                             />
                                         </Table.Cell>
                                     </Table.Row>

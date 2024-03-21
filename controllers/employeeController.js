@@ -102,17 +102,9 @@ const newEmployee = async (req, res, next) => {
 
 const allEmployee = async (req, res, next) => {
   try {
-    const employees = await Employee.find();
-    const empArray = employees.map((emp) => ({
-      firstname: emp.firstname,
-      lastname: emp.lastname,
-      email: emp.email,
-      phone: emp.phone,
-      category: emp.category,
-      division: emp.division,
-      company: emp.company,
-    }));
-    res.status(200).json({ empArray });
+    const employees = await Employee.find().lean();
+    const modified = employees.map(({ password, ...rest }) => rest);
+    res.status(200).json({ message: "All employees details", result: modified });
   } catch (error) {
     next(error);
   }

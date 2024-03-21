@@ -33,7 +33,7 @@ function DatePicker() {
 
     return (
         <div className='mr-3'>
-            <input type="date" value={date} onChange={handleDateChange} />
+            <input className='bg-white' type="date" value={date} onChange={handleDateChange} />
         </div>
     );
 }
