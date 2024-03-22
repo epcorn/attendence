@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import Loading from './Loading';
 import { useDispatch } from 'react-redux';
 import { dayTypeness, toggleLateness, togglePresence } from '../redux/attendence/attendenceSlice';
+import { toast } from "react-toastify";
 
 function Attendence() {
     const workdayStatusDate = useSelector(state => state.dayStat.date);
@@ -37,11 +38,21 @@ function Attendence() {
     };
 
     function handleLateness(id) {
+        const status = workdayStatus.find(status => status.employeeId === id);
+        if (!status.isPresent) {
+            toast.warning("Employee not Present yet!", { autoClose: 1000 });
+            return;
+        }
         dispatch(toggleLateness(id));
     }
 
     function handleType(e, id) {
         const type = e.target.value;
+        const status = workdayStatus.find(status => status.employeeId === id);
+        if (!status.isPresent) {
+            toast.warning("Employee not Present yet!", { autoClose: 1000 });
+            return;
+        }
         dispatch(dayTypeness({ id, type }));
     }
     return (
@@ -68,9 +79,9 @@ function Attendence() {
                             <Table.Head>
                                 <Table.HeadCell>Employee ID</Table.HeadCell>
                                 <Table.HeadCell>Check In time</Table.HeadCell>
-                                <Table.HeadCell>Schedule Type</Table.HeadCell>
-                                <Table.HeadCell>Is late</Table.HeadCell>
+                                <Table.HeadCell>Select</Table.HeadCell>
                                 <Table.HeadCell>Attendance</Table.HeadCell>
+                                <Table.HeadCell>Late</Table.HeadCell>
                             </Table.Head>
                             {workdayStatus?.map((employee) => (
                                 <Table.Body key={employee.employeeId} className="divide-y">
@@ -82,7 +93,15 @@ function Attendence() {
                                             {new Date(employee.checkInTime).toLocaleTimeString()}
                                         </Table.Cell>
                                         <Table.Cell>
+                                            <Checkbox
+                                                disabled={block}
+                                                checked={employee.isPresent} // Use checked instead of value and defaultChecked
+                                                onChange={(e) => handleClick(employee.employeeId, e.target.checked)} // Use onChange instead of onClick for checkboxes
+                                            />
+                                        </Table.Cell>
+                                        <Table.Cell>
                                             <Select disabled={block} id="type" value={employee.scheduleType === null ? "" : employee.scheduleType} onChange={(e) => handleType(e, employee.employeeId)}>
+                                                <option value=""></option>
                                                 <option value="full">full</option>
                                                 <option value="half">half</option>
                                             </Select>
@@ -90,13 +109,7 @@ function Attendence() {
                                         <Table.Cell>
                                             <Button disabled={block} onClick={() => handleLateness(employee.employeeId)} className={` w-14 ${employee.isLate ? " bg-red-400" : "bg-green-400"}`}>{employee.isLate ? "Late" : "No"}</Button>
                                         </Table.Cell>
-                                        <Table.Cell>
-                                            <Checkbox
-                                                disabled={block}
-                                                checked={employee.isPresent} // Use checked instead of value and defaultChecked
-                                                onChange={(e) => handleClick(employee.employeeId, e.target.checked)} // Use onChange instead of onClick for checkboxes
-                                            />
-                                        </Table.Cell>
+
                                     </Table.Row>
                                 </Table.Body>
                             ))}

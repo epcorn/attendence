@@ -19,7 +19,7 @@ const workdayStatusSchema = mongoose.Schema({
       scheduleType: {
         type: String,
         enum: ["full", "half"],
-        default: "full",
+        default: null,
       },
       isPresent: {
         type: Boolean,
