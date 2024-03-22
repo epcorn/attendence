@@ -1,5 +1,5 @@
 import { useState } from "react";
-import PersonalInfo from './PersonalInfo';
+import PersonalInfo from "./PersonalInfo";
 import FamilyInfo from "./FamilyInfo";
 import ImagesInfo from "./ImagesInfo";
 import CompanyInfo from "./CompanyInfo";
@@ -14,7 +14,7 @@ function Form() {
     category: "",
     company: "",
     blood: "",
-    family: {},
+    family: [],
     images: {
       aadhar: "",
       driving: "",
@@ -23,7 +23,7 @@ function Form() {
       insurance: "",
       passport: "",
       image: "",
-    }
+    },
   });
 
   const FormTitles = ["Personal Info", "Family Info", "Images", "Company"];
@@ -37,24 +37,19 @@ function Form() {
       return <ImagesInfo formData={formData} setFormData={setFormData} />;
     } else {
       return <CompanyInfo formData={formData} setFormData={setFormData} />;
-
     }
   };
 
   return (
-    <div className='form'>
-      <div className='progressbar'>
-        <div
-          style={{ width: page === 0 ? "25%" : page === 1 ? "50%" : page === 2 ? "75%" : "100%" }}
-        ></div>
-      </div>
-      <div className='form-container' >
-        <div className='header' >
-          <h1>{FormTitles[page]}</h1>
+    <div className="form">
+      <div className=" w-full h-full">
+        <div className=" flex items-center justify-center">
+          <h1 className=" font-extrabold">{FormTitles[page]}</h1>
         </div>
-        <div className='body' >{PageDisplay()}</div>
-        <div className='footer'>
+        <div className="body">{PageDisplay()}</div>
+        <div className=" mt-1 flex items-center justify-center gap-4">
           <button
+            className="p-3 bg-green-400 text-gray-800 rounded-md hover:bg-green-300 w-24"
             disabled={page === 0}
             onClick={() => {
               setPage((currPage) => currPage - 1);
@@ -63,6 +58,7 @@ function Form() {
             Prev
           </button>
           <button
+            className="p-3 bg-green-400 text-gray-800 rounded-md hover:bg-green-300 w-24"
             onClick={() => {
               if (page === FormTitles.length - 1) {
                 alert("FORM SUBMITTED");
