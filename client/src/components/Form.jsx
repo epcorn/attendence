@@ -14,7 +14,12 @@ function Form() {
     category: "",
     company: "",
     blood: "",
-    family: [],
+    family: [
+      { id: 1, firstname: "", lastname: "", relation: "", email: "", phone: "" },
+      { id: 2, firstname: "", lastname: "", relation: "", email: "", phone: "" },
+      { id: 3, firstname: "", lastname: "", relation: "", email: "", phone: "" },
+      { id: 4, firstname: "", lastname: "", relation: "", email: "", phone: "" },
+    ],
     images: {
       aadhar: "",
       driving: "",

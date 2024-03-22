@@ -5,6 +5,10 @@ import cookieParser from 'cookie-parser';
 import rootRouter from "./routes/index.js";
 import connectDB from "./config/mongoose.js";
 import errorMiddleware from './middleware/errorMiddleware.js';
+import cloudinary from './config/cloudinary.js';
+import fileUpload from 'express-fileupload';
+
+import fs from "fs";
 
 connectDB();
 
@@ -12,10 +16,44 @@ const app = express();
 
 //Root Middleware
 app.use(cors());
-
 app.use(express.json());
 app.use(cookieParser());
+app.use(fileUpload({
+    useTempFiles: true,
+}));
 
+
+app.post('/api/v1/upload', async function (req, res, next) {
+    console.log(req.files);
+    try {
+        const imageLinks = [];
+        if (req.files) {
+            let images = [];
+            if (req.files.images.length > 0) images = req.files.images;
+            else images.push(req.files.images);
+
+            for (let i = 0; i < images.length; i++) {
+                const result = await cloudinary.uploader.upload(
+                    images[i].tempFilePath,
+                    {
+                        use_filename: true,
+                        folder: "employee",
+                        quality: 50,
+                        resource_type: "auto",
+                    }
+                );
+                console.log(result);
+                imageLinks.push(result.secure_url);
+                fs.unlinkSync(images[i].tempFilePath);
+            }
+            return res.status(200).json({ message: "Image uploaded Successfully!", link: imageLinks });
+        }
+
+    } catch (error) {
+        console.log(error);
+        next(error);
+    }
+});
 
 app.use("/api/v1", rootRouter);
 
