@@ -52,6 +52,7 @@ export const logout = createAsyncThunk(
         "http://localhost:3000/api/v1/employee/logout",
         {
           method: "POST",
+          headers: { "Content-Type": "application/json" },
         }
       );
 
