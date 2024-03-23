@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { useState } from "react";
 import PersonalInfo from "./PersonalInfo";
 import FamilyInfo from "./FamilyInfo";
