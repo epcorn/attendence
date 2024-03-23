@@ -3,8 +3,13 @@ import PersonalInfo from "./PersonalInfo";
 import FamilyInfo from "./FamilyInfo";
 import ImagesInfo from "./ImagesInfo";
 import CompanyInfo from "./CompanyInfo";
+import { useDispatch, useSelector } from 'react-redux';
+import { newEmployee } from '../redux/employee/employeeSlice';
+import Loading from './Loading';
 
-function Form() {
+function Form({ setOpenModal }) {
+  const dispatch = useDispatch();
+  const { loading } = useSelector(state => state.workers);
   const [page, setPage] = useState(0);
   const [formData, setFormData] = useState({
     firstname: "",
@@ -12,6 +17,7 @@ function Form() {
     email: "",
     division: "",
     category: "",
+    phone: "",
     company: "",
     blood: "",
     family: [
@@ -32,7 +38,7 @@ function Form() {
   });
 
   const FormTitles = ["Personal Info", "Family Info", "Images", "Company"];
-
+  console.log(formData);
   const PageDisplay = () => {
     if (page === 0) {
       return <PersonalInfo formData={formData} setFormData={setFormData} />;
@@ -47,6 +53,7 @@ function Form() {
 
   return (
     <div className="form">
+      {loading && <Loading />}
       <div className=" w-full h-full">
         <div className=" flex items-center justify-center">
           <h1 className=" font-extrabold">{FormTitles[page]}</h1>
@@ -66,8 +73,8 @@ function Form() {
             className="p-3 bg-green-400 text-gray-800 rounded-md hover:bg-green-300 w-24"
             onClick={() => {
               if (page === FormTitles.length - 1) {
-                alert("FORM SUBMITTED");
-                console.log(formData);
+                dispatch(newEmployee(formData));
+                setOpenModal(false);
               } else {
                 setPage((currPage) => currPage + 1);
               }

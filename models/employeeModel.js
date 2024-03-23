@@ -21,7 +21,7 @@ const employeeSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ["admin", "oprator"],
+    enum: ["admin", "oprator", "hr"],
     default: null
   },
   category: {
@@ -39,10 +39,16 @@ const employeeSchema = new mongoose.Schema({
   },
 });
 
-employeeSchema.pre("save", async function encryptPass() {
-  const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, salt);
+employeeSchema.pre("save", async function encryptPass(next) {
+  try {
+    const hashedPassword = await bcrypt.hash(this.password, 10);
+    this.password = hashedPassword;
+    next();
+  } catch (error) {
+    next(error);
+  }
 });
+
 employeeSchema.methods.comparePassword = async function (pass) {
   return await bcrypt.compare(pass, this.password);
 };

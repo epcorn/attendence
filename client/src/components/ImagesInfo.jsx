@@ -21,7 +21,6 @@ function ImagesInfo({ formData, setFormData }) {
 
             const res = await fetch("/api/v1/upload", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
                 body: form,
             });
             const data = await res.json();

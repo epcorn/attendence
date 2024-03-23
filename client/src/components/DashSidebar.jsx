@@ -47,7 +47,7 @@ export default function DashSidebar() {
                         <Sidebar.Item
                             active={tab === "profile"}
                             icon={HiArrowCircleRight}
-                            label={currentUser.role === "admin" ? "Admin" : currentUser.role === "oprator" ? "Oprator" : "Employee"}
+                            label={currentUser.role === "admin" ? "Admin" : currentUser.role === "oprator" ? "Oprator" : currentUser.role === "hr" ? "Hr" : "Employee"}
                             labelColor="dark"
                             as="div"
                         >
@@ -65,7 +65,7 @@ export default function DashSidebar() {
                             </Sidebar.Item>
                         </Link>
                     )}
-                    {currentUser.role === "admin" && (
+                    {currentUser.role === "hr" && (
                         <Link to="/dashboard?tab=employee">
                             <Sidebar.Item
                                 active={tab === "Employee"}

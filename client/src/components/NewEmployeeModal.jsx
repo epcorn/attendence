@@ -15,7 +15,7 @@ function NewEmployeeModal({ openModal, setOpenModal }) {
       >
         <Modal.Header />
         <Modal.Body>
-          <Form />
+          <Form setOpenModal={setOpenModal} />
         </Modal.Body>
       </Modal>
     </>

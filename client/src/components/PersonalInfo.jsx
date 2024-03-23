@@ -32,12 +32,22 @@ function PersonalInfo({ formData, setFormData }) {
         />
       </div>
       <div className=" mb-2">
+        <Label className="font-bold" htmlFor="phone" value="Phone Number" />
+        <TextInput type='number' id="phone" required value={formData.phone}
+          onChange={(e) =>
+            setFormData({ ...formData, phone: e.target.value })
+          } />
+      </div>
+      <div className=" mb-2">
         <Label className="font-bold" htmlFor="email" value="Your email" />
-        <TextInput id="email" placeholder="name@company.com" required />
+        <TextInput id="email" placeholder="name@company.com" required value={formData.email}
+          onChange={(e) =>
+            setFormData({ ...formData, email: e.target.value })
+          } />
       </div>
       <div className=" mb-2">
         <Label className="font-bold" htmlFor="bg" value="Blood Group" />
-        <TextInput id="bg" placeholder="o+" required />
+        <TextInput id="bg" placeholder="o+" required value={formData.blood} onChange={(e) => setFormData({ ...formData, blood: e.target.value })} />
       </div>
     </div>
   );

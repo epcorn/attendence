@@ -33,12 +33,17 @@ const ifAdmin = (req, res, next) => {
     next();
 };
 const ifOprator = (req, res, next) => {
-    console.log(req.user.role);
     if (req.user.role !== "oprator") {
-        return next(errorHandler(403, "Not oprator"));
+        return next(errorHandler(403, "Not Oprator"));
+    }
+    next();
+};
+const ifHr = (req, res, next) => {
+    if (req.user.role !== "hr") {
+        return next(errorHandler(403, "Not Hr"));
     }
     next();
 };
 
-export { verifyToken, ifAdmin, ifOprator, createToken }
+export { verifyToken, ifAdmin, ifOprator, ifHr, createToken }
 

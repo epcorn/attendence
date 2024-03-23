@@ -77,10 +77,29 @@ const setOprator = async (req, res, next) => {
     next(error);
   }
 };
+const setHr = async (req, res, next) => {
+  try {
+    const { empId } = req.params;
+    const updatedEmployee = await Employee.findByIdAndUpdate(
+      empId,
+      { isOprator: true },
+      { new: true }
+    );
+    if (!updatedEmployee) {
+      return next(errorMiddleware(404, "Employee not found!"));
+    }
+    const { password, ...rest } = updatedEmployee._doc;
+    res.status(200).json({
+      message: `${updatedEmployee.firstname} is Hr now!`,
+      employee: rest,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 const newEmployee = async (req, res, next) => {
   try {
-    const { firstname, lastname, email, phone, category, division, company } =
-      req.body;
+    const { firstname, lastname, email, phone, category, division, company } = req.body.data;
     const createdEmployee = await Employee.create({
       firstname,
       lastname,
@@ -91,10 +110,11 @@ const newEmployee = async (req, res, next) => {
       company,
       password: phone,
     });
+    console.log(createdEmployee);
     const { password, ...rest } = createdEmployee._doc;
     res
       .status(201)
-      .json({ message: "Employee is Registered!", employee: rest });
+      .json({ message: "Employee is Registered!", result: rest });
   } catch (error) {
     next(error);
   }
@@ -128,6 +148,7 @@ const deleteEmployee = async (req, res, next) => { };
 
 export {
   login,
+  setHr,
   setAdmin,
   setOprator,
   newEmployee,

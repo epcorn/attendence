@@ -1,5 +1,4 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { workdayStatus } from '../attendence/attendenceSlice';
 import { toast } from 'react-toastify';
 
 const initialState = {
@@ -22,6 +21,25 @@ export const getEmployees = createAsyncThunk(
     }
 );
 
+export const newEmployee = createAsyncThunk(
+    "newEmployee",
+    async (data, { rejectWithValue }) => {
+        console.log(data);
+        try {
+            const response = await fetch("http://localhost:3000/api/v1/employee/new", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ data }),
+            });
+            const result = await response.json();
+            console.log(result);
+            return result;
+        } catch (error) {
+            console.log(error);
+            return rejectWithValue(error);
+        }
+    });
+
 export const employeeSlice = createSlice({
     name: "employee",
     initialState,
@@ -34,10 +52,22 @@ export const employeeSlice = createSlice({
                 toast.success(action.payload.message, { autoClose: 1000 });
                 state.error = null;
             })
-            .addCase(workdayStatus.pending, (state) => {
+            .addCase(getEmployees.pending, (state) => {
                 state.loading = true;
             })
-            .addCase(workdayStatus.rejected, (state, action) => {
+            .addCase(getEmployees.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.error;
+                console.log(action.error);
+            })
+            .addCase(newEmployee.fulfilled, (state, action) => {
+                state.loading = false;
+                state.employees.push(action.payload.result);
+            })
+            .addCase(newEmployee.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(newEmployee.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.error;
                 console.log(action.error);
