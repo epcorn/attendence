@@ -123,6 +123,7 @@ export const attendenceSlice = createSlice({
       })
       .addCase(workdayStatus.rejected, (state, action) => {
         state.loading = false;
+        state.workdayStatus = [];
         toast.error(action.payload.message, { autoClose: 1000 });
       })
       .addCase(togglePresence.fulfilled, (state, action) => {
