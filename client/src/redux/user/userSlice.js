@@ -4,7 +4,6 @@ import { toast } from "react-toastify";
 const initialState = {
   currentUser: null,
   loading: false,
-  error: null,
 };
 
 export const createEmployee = createAsyncThunk(
@@ -16,6 +15,10 @@ export const createEmployee = createAsyncThunk(
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
+      if (!response.ok) {
+        const errorData = await response.json();
+        return rejectWithValue(errorData);
+      }
       const result = await response.json();
       return result;
     } catch (error) {
@@ -36,6 +39,10 @@ export const login = createAsyncThunk(
           body: JSON.stringify(data),
         }
       );
+      if (!response.ok) {
+        const errorData = await response.json();
+        return rejectWithValue(errorData);
+      }
       const result = await response.json();
       return result;
     } catch (error) {
@@ -55,7 +62,10 @@ export const logout = createAsyncThunk(
           headers: { "Content-Type": "application/json" },
         }
       );
-
+      if (!response.ok) {
+        const errorData = await response.json();
+        return rejectWithValue(errorData);
+      }
       const result = await response.json();
       return result;
     } catch (error) {
@@ -79,7 +89,7 @@ export const userSlice = createSlice({
       })
       .addCase(createEmployee.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload.message;
+        toast.error(action.payload.message, { autoClose: 1000 });
       })
       .addCase(login.fulfilled, (state, action) => {
         state.loading = false;
@@ -91,7 +101,7 @@ export const userSlice = createSlice({
       })
       .addCase(login.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload;
+        toast.error(action.payload.message, { autoClose: 1000 });
       })
       .addCase(logout.fulfilled, (state) => {
         state.loading = false;
@@ -102,7 +112,7 @@ export const userSlice = createSlice({
       })
       .addCase(logout.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload;
+        toast.error(action.payload.message, { autoClose: 1000 });
       });
   },
 });
