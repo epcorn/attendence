@@ -11,7 +11,7 @@ export const getEmployees = createAsyncThunk(
   "getEmployees",
   async (data, { rejectWithValue }) => {
     try {
-      const response = await fetch("http://localhost:3000/api/v1/employee/");
+      const response = await fetch("/api/v1/employee/");
       if (!response.ok) {
         const errorData = await response.json();
         return rejectWithValue(errorData);
@@ -31,7 +31,7 @@ export const newEmployee = createAsyncThunk(
     console.log(data);
     try {
       const response = await fetch(
-        "http://localhost:3000/api/v1/employee/new",
+        "/api/v1/employee/new",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

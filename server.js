@@ -18,9 +18,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
-app.use(fileUpload({
-    useTempFiles: true,
-}));
+app.use(fileUpload({ useTempFiles: true, }));
 
 
 app.post('/api/v1/upload', async function (req, res, next) {

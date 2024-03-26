@@ -39,7 +39,7 @@ export const togglePresence = createAsyncThunk(
   async (id, { rejectWithValue }) => {
     try {
       const response = await fetch(
-        `http://localhost:3000/api/v1/dayReport/checkIn/${id}`,
+        `/api/v1/dayReport/checkIn/${id}`,
         { method: "POST", headers: { "Content-Type": "application/json" } }
       );
       if (!response.ok) {
@@ -60,7 +60,7 @@ export const toggleLateness = createAsyncThunk(
   async (id, { rejectWithValue }) => {
     try {
       const response = await fetch(
-        `http://localhost:3000/api/v1/dayReport/markLate/${id}`,
+        `/api/v1/dayReport/markLate/${id}`,
         { method: "POST", headers: { "Content-Type": "application/json" } }
       );
       if (!response.ok) {
@@ -81,7 +81,7 @@ export const dayTypeness = createAsyncThunk(
   async ({ id, type }, { rejectWithValue }) => {
     try {
       const response = await fetch(
-        `http://localhost:3000/api/v1/dayReport/changeDayScheduleType/${id}`,
+        `/api/v1/dayReport/changeDayScheduleType/${id}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

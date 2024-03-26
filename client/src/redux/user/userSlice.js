@@ -32,7 +32,7 @@ export const login = createAsyncThunk(
   async (data, { rejectWithValue }) => {
     try {
       const response = await fetch(
-        "http://localhost:3000/api/v1/employee/login",
+        "/api/v1/employee/login",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -56,7 +56,7 @@ export const logout = createAsyncThunk(
   async (data, { rejectWithValue }) => {
     try {
       const response = await fetch(
-        "http://localhost:3000/api/v1/employee/logout",
+        "/api/v1/employee/logout",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
