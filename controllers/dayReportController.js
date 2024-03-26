@@ -29,7 +29,6 @@ const todaysStatus = async (req, res, next) => {
       if (workdayStatus.length === 0) {
         workdayStatus.push(await createOrUpdateWorkdayStatus());
       }
-      console.log(workdayStatus);
       return res.status(200).json({
         message: "Today's day Status",
         workdayStatus: workdayStatus[0],
