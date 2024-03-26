@@ -14,7 +14,7 @@ export const workdayStatus = createAsyncThunk(
   async (date, { rejectWithValue }) => {
     try {
       const response = await fetch(
-        "http://localhost:3000/api/v1/dayReport/status",
+        "/api/v1/dayReport/status",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
