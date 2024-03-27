@@ -12,6 +12,16 @@ const workdayStatusSchema = mongoose.Schema({
         ref: "Employee",
         required: true,
       },
+      employeeInfo: {
+        firstname: {
+          type: String,
+          default: null,
+        },
+        lastname: {
+          type: String,
+          default: null,
+        },
+      },
       checkInTime: {
         type: Date,
         default: null,
@@ -99,19 +109,24 @@ async function createOrUpdateWorkdayStatus() {
   let existingWorkdayStatus = await WorkdayStatus.findOne({ date: currentDate });
 
   if (!existingWorkdayStatus) {
-
     existingWorkdayStatus = new WorkdayStatus({ date: currentDate });
 
-    const allEmployees = await Employee.find({}, '_id');
+    const allEmployees = await Employee.find({}, '_id firstname lastname');
 
+    // Map through employees to create check-ins with selected fields populated
     existingWorkdayStatus.checkIns = allEmployees.map(employee => ({
       employeeId: employee._id,
+      employeeInfo: {
+        firstname: employee.firstname,
+        lastname: employee.lastname,
+      },
     }));
 
     await existingWorkdayStatus.save();
   }
   return existingWorkdayStatus;
 }
+
 
 const addCheckInToWorkdayStatus = async (checkInData) => {
   const workdayStatus = await createOrUpdateWorkdayStatus();

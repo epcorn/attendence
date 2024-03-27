@@ -20,6 +20,7 @@ function Attendence() {
   const { currentUser } = useSelector((state) => state.user);
   const { workdayStatus, loading } = useSelector((state) => state.dayStat);
   const [searchTerm, setSearchTerm] = useState("");
+  const [searchArray, setSearchArray] = useState([]);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -30,10 +31,6 @@ function Attendence() {
       setBlock(false);
     }
   }, [workdayStatusDate, todayDate]);
-
-  function handleSubmit() {
-    console.log(searchTerm);
-  }
 
   const handleClick = (employeeId) => {
     dispatch(togglePresence(employeeId));
@@ -57,12 +54,41 @@ function Attendence() {
     }
     dispatch(dayTypeness({ id, type }));
   }
+
+
+
+  useEffect(() => {
+    function searchEmployees(query, employeeArray) {
+      const results = [];
+
+      // Convert the query to lowercase for case-insensitive search
+      const lowercaseQuery = query.toLowerCase();
+
+      employeeArray.forEach(employee => {
+        const { firstname, lastname } = employee.employeeInfo;
+
+        // Convert the first name and last name to lowercase for case-insensitive search
+        const lowercaseFirstName = firstname.toLowerCase();
+        const lowercaseLastName = lastname.toLowerCase();
+
+        // Check if either the first name or last name contains the search query
+        if (lowercaseFirstName.includes(lowercaseQuery) || lowercaseLastName.includes(lowercaseQuery)) {
+          results.push(employee);
+        }
+      });
+      console.log(results);
+      setSearchArray(results);
+    }
+    searchEmployees(searchTerm, workdayStatus);
+  }, [searchTerm, workdayStatus]);
+
+
   return (
     <div className="flex-col mt-2 mx-auto w-full ">
       {loading && <Loading />}
       <div className=" flex justify-between">
         <div></div>
-        <form onSubmit={handleSubmit}>
+        <form>
           <TextInput
             type="text"
             value={searchTerm}
@@ -75,11 +101,11 @@ function Attendence() {
         <DatePicker />
       </div>
       <div className="table-auto overflow-x-scroll md:mx-auto p-3 scrollbar scrollbar-track-slate-100 scrollbar-thumb-slate-300 dark:scrollbar-track-slate-700 dark:scrollbar-thumb-slate-500">
-        {currentUser.role === "oprator" && workdayStatus.length > 0 ? (
+        {currentUser.role === "oprator" && workdayStatus.length > 0 && searchArray.length <= 0 ? (
           <>
             <Table hoverable className=" shadow-md">
               <Table.Head>
-                <Table.HeadCell>Employee ID</Table.HeadCell>
+                <Table.HeadCell>Name</Table.HeadCell>
                 <Table.HeadCell>Check In time</Table.HeadCell>
                 <Table.HeadCell>Select</Table.HeadCell>
                 <Table.HeadCell>Attendance</Table.HeadCell>
@@ -88,7 +114,7 @@ function Attendence() {
               {workdayStatus?.map((employee) => (
                 <Table.Body key={employee.employeeId} className="divide-y">
                   <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
-                    <Table.Cell>{employee.employeeId}</Table.Cell>
+                    <Table.Cell>{`${employee.employeeInfo.firstname} ${employee.employeeInfo.lastname}`}</Table.Cell>
                     <Table.Cell>
                       {new Date(employee.checkInTime).toLocaleTimeString()}
                     </Table.Cell>
@@ -121,9 +147,8 @@ function Attendence() {
                       <Button
                         disabled={block}
                         onClick={() => handleLateness(employee.employeeId)}
-                        className={` w-14 ${
-                          employee.isLate ? " bg-red-400" : "bg-green-400"
-                        }`}
+                        className={` w-14 ${employee.isLate ? " bg-red-400" : "bg-green-400"
+                          }`}
                       >
                         {employee.isLate ? "Late" : "No"}
                       </Button>
@@ -134,10 +159,69 @@ function Attendence() {
             </Table>
           </>
         ) : (
-          <p className=" text-center font-bold">No Data found!!</p>
+          searchArray.length > 0 ? (
+            <>
+              <Table hoverable className=" shadow-md">
+                <Table.Head>
+                  <Table.HeadCell>Name</Table.HeadCell>
+                  <Table.HeadCell>Check In time</Table.HeadCell>
+                  <Table.HeadCell>Select</Table.HeadCell>
+                  <Table.HeadCell>Attendance</Table.HeadCell>
+                  <Table.HeadCell>Late</Table.HeadCell>
+                </Table.Head>
+                {searchArray?.map((employee) => (
+                  <Table.Body key={employee.employeeId} className="divide-y">
+                    <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                      <Table.Cell>{`${employee.employeeInfo.firstname} ${employee.employeeInfo.lastname}`}</Table.Cell>
+                      <Table.Cell>
+                        {new Date(employee.checkInTime).toLocaleTimeString()}
+                      </Table.Cell>
+                      <Table.Cell>
+                        <Checkbox
+                          disabled={block}
+                          checked={employee.isPresent} // Use checked instead of value and defaultChecked
+                          onChange={(e) =>
+                            handleClick(employee.employeeId, e.target.checked)
+                          } // Use onChange instead of onClick for checkboxes
+                        />
+                      </Table.Cell>
+                      <Table.Cell>
+                        <Select
+                          disabled={block}
+                          id="type"
+                          value={
+                            employee.scheduleType === null
+                              ? ""
+                              : employee.scheduleType
+                          }
+                          onChange={(e) => handleType(e, employee.employeeId)}
+                        >
+                          <option value=""></option>
+                          <option value="full">full</option>
+                          <option value="half">half</option>
+                        </Select>
+                      </Table.Cell>
+                      <Table.Cell>
+                        <Button
+                          disabled={block}
+                          onClick={() => handleLateness(employee.employeeId)}
+                          className={` w-14 ${employee.isLate ? " bg-red-400" : "bg-green-400"
+                            }`}
+                        >
+                          {employee.isLate ? "Late" : "No"}
+                        </Button>
+                      </Table.Cell>
+                    </Table.Row>
+                  </Table.Body>
+                ))}
+              </Table>
+            </>
+          ) : (
+            <p className=" text-center font-bold">No Data found!!</p>
+          )
         )}
       </div>
-    </div>
+    </div >
   );
 }
 
