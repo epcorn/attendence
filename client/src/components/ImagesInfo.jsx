@@ -1,18 +1,20 @@
 /* eslint-disable react/prop-types */
 import { FileInput, Label } from 'flowbite-react';
+import { useState } from 'react';
 import { toast } from "react-toastify";
+import Loading from './Loading';
 
 
 
 
 // eslint-disable-next-line no-unused-vars
 function ImagesInfo({ formData, setFormData }) {
+    const [loading, setLoading] = useState(false);
 
     async function handleFile(e) {
         const { files, name } = e.target;
-        console.log(files);
-        console.log(`name: ${name}`);
         try {
+            setLoading(true);
             const images = Array.from(files);
             const form = new FormData();
             images.forEach((image) => {
@@ -23,19 +25,32 @@ function ImagesInfo({ formData, setFormData }) {
                 method: "POST",
                 body: form,
             });
+            if (!res.ok) {
+                const errorData = await res.json();
+                return toast.error(`${errorData.message}`, { autoClose: 1000 });
+            }
             const data = await res.json();
 
-            setFormData((prev) => ({ ...prev, [name]: data.link }));
-
+            setFormData({
+                ...formData,
+                images: {
+                    ...formData.images,
+                    [name]: data.link
+                }
+            });
             toast.success(data.message);
+
         } catch (error) {
             console.log(error);
-            toast.error("Document Upload Failed");
+            toast.error("Document Upload Failed", { autoClose: 1000 });
+        } finally {
+            setLoading(false);
         }
     }
 
     return (
         <div className='flex items-center justify-center mt-2 gap-2'>
+            {loading && <Loading />}
             <div>
                 <div className="mb-5 block">
                     <div>

@@ -19,7 +19,7 @@ function CompanyInfo({ formData, setFormData }) {
                     <option value="pc">PC</option>
                     <option value="lc">LC</option>
                     <option value="att">ATT</option>
-                    <option value="oc">OC</option>
+                    <option value="os">OS</option>
                     <option value="fs">FS</option>
                 </Select>
             </div>

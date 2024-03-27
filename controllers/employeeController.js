@@ -98,7 +98,7 @@ const setHr = async (req, res, next) => {
 };
 const newEmployee = async (req, res, next) => {
   try {
-    const { firstname, lastname, email, phone, category, division, company } = req.body.data;
+    const { firstname, lastname, email, phone, category, division, company, blood, family, images } = req.body.data;
     const createdEmployee = await Employee.create({
       firstname,
       lastname,
@@ -108,6 +108,9 @@ const newEmployee = async (req, res, next) => {
       division,
       company,
       password: phone,
+      blood,
+      family,
+      images,
     });
     console.log(createdEmployee);
     const { password, ...rest } = createdEmployee._doc;

@@ -22,7 +22,6 @@ app.use(fileUpload({ useTempFiles: true, }));
 
 
 app.post('/api/v1/upload', async function (req, res, next) {
-    console.log(req.files);
     try {
         let imageLinks = "";
         if (req.files) {

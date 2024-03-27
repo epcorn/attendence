@@ -13,7 +13,9 @@ function NewEmployeeModal({ openModal, setOpenModal }) {
         popup
         onClose={() => setOpenModal(false)}
       >
-        <Modal.Header />
+        <Modal.Header>
+
+        </Modal.Header>
         <Modal.Body>
           <Form setOpenModal={setOpenModal} />
         </Modal.Body>

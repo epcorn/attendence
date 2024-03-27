@@ -4,12 +4,10 @@
 
 .App {
   background: rgb(255, 0, 228);
-  background: radial-gradient(
-    circle,
-    rgba(255, 0, 228, 1) 0%,
-    rgba(212, 51, 16, 1) 84%,
-    rgba(255, 0, 95, 1) 100%
-  );
+  background: radial-gradient(circle,
+      rgba(255, 0, 228, 1) 0%,
+      rgba(212, 51, 16, 1) 84%,
+      rgba(255, 0, 95, 1) 100%);
   width: 100vw;
   height: 100vh;
   display: grid;
@@ -110,14 +108,14 @@ body {
 .progressbar {
   width: 400px;
   height: 10px;
-  background-color: white;
+  background-color: rgb(202, 196, 196);
   margin-bottom: 50px;
 }
 
 .progressbar div {
   width: 33.3%;
   height: 100%;
-  background-color: rgb(98, 0, 255);
+  background-color: rgb(137, 112, 214);
 }
 
 .other-info-container {

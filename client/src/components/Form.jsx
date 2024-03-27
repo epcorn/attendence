@@ -39,7 +39,6 @@ function Form({ setOpenModal }) {
   });
 
   const FormTitles = ["Personal Info", "Family Info", "Images", "Company"];
-  console.log(formData);
   const PageDisplay = () => {
     if (page === 0) {
       return <PersonalInfo formData={formData} setFormData={setFormData} />;
@@ -55,6 +54,11 @@ function Form({ setOpenModal }) {
   return (
     <div className="form">
       {loading && <Loading />}
+      <div className="progressbar">
+        <div
+          style={{ width: page === 0 ? "25%" : page == 1 ? "50%" : page == 2 ? "75%" : "100%" }}
+        ></div>
+      </div>
       <div className=" w-full h-full">
         <div className=" flex items-center justify-center">
           <h1 className=" font-extrabold">{FormTitles[page]}</h1>
