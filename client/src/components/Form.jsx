@@ -75,6 +75,7 @@ function Form({ setOpenModal }) {
             Prev
           </button>
           <button
+            type={page === FormTitles.length - 1 ? "submit" : "button"}
             className="p-3 bg-green-400 text-gray-800 rounded-md hover:bg-green-300 w-24"
             onClick={() => {
               if (page === FormTitles.length - 1) {

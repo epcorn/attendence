@@ -118,6 +118,10 @@ const newEmployee = async (req, res, next) => {
       .status(201)
       .json({ message: "Employee is Registered!", result: rest });
   } catch (error) {
+    if (error.name === 'ValidationError') {
+      error.status = 400;
+      error.message = 'Please fill all required fields';
+    }
     next(error);
   }
 };

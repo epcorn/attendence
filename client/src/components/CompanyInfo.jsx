@@ -5,7 +5,7 @@ function CompanyInfo({ formData, setFormData }) {
     return (
         <div className="">
             <div className=" mb-2">
-                <Label className="font-bold" htmlFor="division" value="Division" />
+                <Label className="font-bold" htmlFor="division"><span className=' text-xl text-red-700'>*</span>Division</Label>
                 <Select
                     id="division"
                     required
@@ -24,7 +24,7 @@ function CompanyInfo({ formData, setFormData }) {
                 </Select>
             </div>
             <div className=" mb-2">
-                <Label className="font-bold" htmlFor="category" value="Category" />
+                <Label className="font-bold" htmlFor="category"><span className=' text-xl text-red-700'>*</span>Category</Label>
                 <Select
                     id="category"
                     required
@@ -42,7 +42,7 @@ function CompanyInfo({ formData, setFormData }) {
                 </Select>
             </div>
             <div className=" mb-2">
-                <Label className="font-bold" htmlFor="company" value="Company" />
+                <Label className="font-bold" htmlFor="company"><span className=' text-xl text-red-700'>*</span>Company</Label>
                 <Select
                     id="company"
                     required

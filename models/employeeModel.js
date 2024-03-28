@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 
+
 const employeeSchema = new mongoose.Schema({
   firstname: {
     type: String,

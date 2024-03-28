@@ -69,7 +69,7 @@ export const employeeSlice = createSlice({
       })
       .addCase(getEmployees.rejected, (state, action) => {
         state.loading = false;
-        toast.success(action.payload.message, { autoClose: 1000 });
+        toast.error(action.payload.message, { autoClose: 1000 });
       })
       .addCase(newEmployee.fulfilled, (state, action) => {
         state.loading = false;
@@ -80,7 +80,7 @@ export const employeeSlice = createSlice({
       })
       .addCase(newEmployee.rejected, (state, action) => {
         state.loading = false;
-        toast.success(action.payload.message, { autoClose: 1000 });
+        toast.error(action.payload.message, { autoClose: 1000 });
       });
   },
 });
