@@ -4,8 +4,10 @@ import {
   changeDayScheduleType,
   markLate,
   todaysStatus,
+  reportType1,
+
 } from "../controllers/dayReportController.js";
-import { ifAdmin, ifOprator, verifyToken } from "../middleware/verifyUser.js";
+import { ifOprator, verifyToken } from "../middleware/verifyUser.js";
 const router = Router();
 
 router.post("/status", verifyToken, ifOprator, todaysStatus);
@@ -17,5 +19,6 @@ router.post(
   changeDayScheduleType
 );
 router.post("/markLate/:empId", verifyToken, ifOprator, markLate);
+router.post("/getReport", reportType1);
 
 export default router;

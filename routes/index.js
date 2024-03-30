@@ -7,5 +7,4 @@ const router = Router();
 router.use("/dayReport", dayReportRoute);
 router.use("/employee", employeeRoute);
 
-
 export default router;

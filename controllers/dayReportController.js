@@ -2,6 +2,9 @@ import {
   createOrUpdateWorkdayStatus,
   WorkdayStatus,
 } from "../models/dayReportModel.js";
+import * as XLSX from "xlsx/xlsx.mjs";
+import fs from 'fs';
+
 
 const todaysStatus = async (req, res, next) => {
   try {
@@ -110,4 +113,54 @@ const markLate = async (req, res, next) => {
   }
 };
 
-export { toogleCheckIn, changeDayScheduleType, markLate, todaysStatus };
+const reportType1 = async (req, res, next) => {
+  const { empId, month, year } = req.body;
+  try {
+    const startDate = new Date(year, month - 1, 1); // First day of the month
+    const endDate = new Date(year, month, 0); // Last day of the month
+    const monthInWords = startDate.toLocaleString('default', { month: 'long' });
+
+    WorkdayStatus.find({
+      'checkIns.employeeId': empId,
+      date: { $gte: startDate, $lte: endDate }
+    }, { 'checkIns.$': 1 })
+      .then(results => {
+        const workbook = XLSX.utils.book_new(); // Create a new workbook
+
+        const filteredCheckIns = results.flatMap(doc => doc.checkIns.filter(checkin => checkin.employeeId.equals(empId)));
+        const worksheets = {};
+
+        filteredCheckIns.forEach(checkIn => {
+          const { employeeInfo, checkInTime, scheduleType, isPresent, isLate } = checkIn;
+          const firstName = employeeInfo ? employeeInfo.firstname : 'Unknown';
+
+          if (!worksheets[firstName]) {
+            worksheets[firstName] = XLSX.utils.json_to_sheet([
+              { 'Date': checkInTime, 'Day Type': scheduleType, 'Is Present': isPresent ? "Present" : "Absent", 'Is Late': isLate ? "Late" : "" }
+            ]);
+            XLSX.utils.book_append_sheet(workbook, worksheets[firstName], firstName);
+          } else {
+            XLSX.utils.sheet_add_json(worksheets[firstName], [
+              { 'Date': checkInTime, 'Day Type': scheduleType, 'Is Present': isPresent ? "Present" : "Absent", 'Is Late': isLate ? "Late" : "" }
+            ], { skipHeader: true, origin: -1 });
+          }
+        });
+
+        // Convert workbook to buffer
+        const buffer = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+
+        // Save buffer to file synchronously
+        fs.writeFileSync(`${monthInWords}.xlsx`, buffer);
+
+        res.status(200).json({ message: "Excel sheet generated and saved successfully." });
+      })
+      .catch(err => {
+        console.error(err);
+        res.status(500).json({ error: "Internal server error" });
+      });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export { toogleCheckIn, changeDayScheduleType, markLate, todaysStatus, reportType1 };

@@ -3,11 +3,13 @@ import { useLocation } from "react-router-dom";
 import DashSidebar from '../components/DashSidebar';
 import Attendence from "../components/Attendence";
 import Employee from "../components/Employee";
+import { useSelector } from 'react-redux';
 
 
 export default function Dashboard() {
+    const { currentUser } = useSelector(store => store.user);
     const location = useLocation();
-    const [tab, setTab] = useState("");
+    const [tab, setTab] = useState(currentUser.role === "hr" ? "employee" : "attendence");
 
     useEffect(() => {
         const urlParams = new URLSearchParams(location.search);
@@ -22,10 +24,11 @@ export default function Dashboard() {
                 {/*Sidebar */}
                 <DashSidebar />
             </div>
-            {/* profile */}
+            {/* Attendece */}
             {tab === "attendence" && <Attendence />}
-            {/* post */}
+            {/* Employees */}
             {tab === "employee" && <Employee />}
+
         </div>
     );
 }

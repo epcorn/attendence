@@ -2,7 +2,6 @@ import { Sidebar } from "flowbite-react";
 import { useEffect, useState } from "react";
 import {
     HiUser,
-    HiArrowCircleRight,
     HiDocumentText,
     HiOutlineUserGroup,
     HiChartPie,
@@ -43,21 +42,11 @@ export default function DashSidebar() {
                             </Sidebar.Item>
                         </Link>
                     )}
-                    <Link to="/dashboard?tab=profile">
-                        <Sidebar.Item
-                            active={tab === "profile"}
-                            icon={HiArrowCircleRight}
-                            label={currentUser.role === "admin" ? "Admin" : currentUser.role === "oprator" ? "Oprator" : currentUser.role === "hr" ? "Hr" : "Employee"}
-                            labelColor="dark"
-                            as="div"
-                        >
-                            Profile
-                        </Sidebar.Item>
-                    </Link>
                     {currentUser.role === "oprator" && (
                         <Link to="/dashboard?tab=attendence">
                             <Sidebar.Item
                                 active={tab === "attendence"}
+                                label={currentUser.role === "admin" ? "Admin" : currentUser.role === "oprator" ? "Oprator" : currentUser.role === "hr" ? "Hr" : "Employee"}
                                 icon={HiDocumentText}
                                 as="div"
                             >
@@ -69,6 +58,7 @@ export default function DashSidebar() {
                         <Link to="/dashboard?tab=employee">
                             <Sidebar.Item
                                 active={tab === "Employee"}
+                                label={currentUser.role === "admin" ? "Admin" : currentUser.role === "oprator" ? "Oprator" : currentUser.role === "hr" ? "Hr" : "Employee"}
                                 icon={HiOutlineUserGroup}
                                 as="div"
                             >

@@ -43,7 +43,6 @@ export const newEmployee = createAsyncThunk(
         return rejectWithValue(errorData);
       }
       const result = await response.json();
-      console.log(result);
       return result;
     } catch (error) {
       console.log(error);
