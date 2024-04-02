@@ -3,8 +3,8 @@ import {
   WorkdayStatus,
 } from "../models/dayReportModel.js";
 import * as XLSX from "xlsx/xlsx.mjs";
-import fs from 'fs';
-
+import fs from "fs";
+import Employee from "../models/employeeModel.js";
 
 const todaysStatus = async (req, res, next) => {
   try {
@@ -41,7 +41,6 @@ const todaysStatus = async (req, res, next) => {
 
     if (todayIsTimestamp > dateTimestamp) {
       const workdayStatus = await WorkdayStatus.find({ date });
-      console.log(workdayStatus);
       if (workdayStatus.length <= 0) {
         return res
           .status(404)
@@ -79,7 +78,6 @@ const changeDayScheduleType = async (req, res, next) => {
   try {
     const { empId } = req.params;
     const { type } = req.body;
-    console.log(req.body);
     const workdayStatus = await createOrUpdateWorkdayStatus();
     const obj = workdayStatus.checkIns.find((checkIn) =>
       checkIn.employeeId.equals(empId)
@@ -117,44 +115,75 @@ const reportType1 = async (req, res, next) => {
   const { empId, month, year } = req.body;
   try {
     const startDate = new Date(year, month - 1, 1); // First day of the month
-    const endDate = new Date(year, month, 0); // Last day of the month
-    const monthInWords = startDate.toLocaleString('default', { month: 'long' });
 
-    WorkdayStatus.find({
-      'checkIns.employeeId': empId,
-      date: { $gte: startDate, $lte: endDate }
-    }, { 'checkIns.$': 1 })
-      .then(results => {
+    const endDate = new Date(year, month, 0); // Last day of the month
+
+    const monthInWords = startDate.toLocaleString("default", { month: "long" });
+
+    WorkdayStatus.find(
+      {
+        "checkIns.employeeId": empId,
+        date: { $gte: startDate, $lt: endDate.setDate(endDate.getDate() + 1) },
+      },
+      { "checkIns.$": 1 }
+    )
+      .then((results) => {
         const workbook = XLSX.utils.book_new(); // Create a new workbook
 
-        const filteredCheckIns = results.flatMap(doc => doc.checkIns.filter(checkin => checkin.employeeId.equals(empId)));
+        const filteredCheckIns = results.flatMap((doc) =>
+          doc.checkIns.filter((checkin) => checkin.employeeId.equals(empId))
+        );
         const worksheets = {};
 
-        filteredCheckIns.forEach(checkIn => {
-          const { employeeInfo, checkInTime, scheduleType, isPresent, isLate } = checkIn;
-          const firstName = employeeInfo ? employeeInfo.firstname : 'Unknown';
+        filteredCheckIns.forEach((checkIn) => {
+          const { employeeInfo, checkInTime, scheduleType, isPresent, isLate } =
+            checkIn;
+          const firstName = employeeInfo ? employeeInfo.firstname : "Unknown";
 
           if (!worksheets[firstName]) {
             worksheets[firstName] = XLSX.utils.json_to_sheet([
-              { 'Date': checkInTime, 'Day Type': scheduleType, 'Is Present': isPresent ? "Present" : "Absent", 'Is Late': isLate ? "Late" : "" }
+              {
+                Date: checkInTime,
+                "Day Type": scheduleType,
+                "Is Present": isPresent ? "Present" : "Absent",
+                "Is Late": isLate ? "Late" : "",
+              },
             ]);
-            XLSX.utils.book_append_sheet(workbook, worksheets[firstName], firstName);
+            XLSX.utils.book_append_sheet(
+              workbook,
+              worksheets[firstName],
+              firstName
+            );
           } else {
-            XLSX.utils.sheet_add_json(worksheets[firstName], [
-              { 'Date': checkInTime, 'Day Type': scheduleType, 'Is Present': isPresent ? "Present" : "Absent", 'Is Late': isLate ? "Late" : "" }
-            ], { skipHeader: true, origin: -1 });
+            XLSX.utils.sheet_add_json(
+              worksheets[firstName],
+              [
+                {
+                  Date: checkInTime,
+                  "Day Type": scheduleType,
+                  "Is Present": isPresent ? "Present" : "Absent",
+                  "Is Late": isLate ? "Late" : "",
+                },
+              ],
+              { skipHeader: true, origin: -1 }
+            );
           }
         });
 
         // Convert workbook to buffer
-        const buffer = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+        const buffer = XLSX.write(workbook, {
+          type: "buffer",
+          bookType: "xlsx",
+        });
 
         // Save buffer to file synchronously
         fs.writeFileSync(`${monthInWords}.xlsx`, buffer);
 
-        res.status(200).json({ message: "Excel sheet generated and saved successfully." });
+        res
+          .status(200)
+          .json({ message: "Excel sheet generated and saved successfully." });
       })
-      .catch(err => {
+      .catch((err) => {
         console.error(err);
         res.status(500).json({ error: "Internal server error" });
       });
@@ -163,4 +192,84 @@ const reportType1 = async (req, res, next) => {
   }
 };
 
-export { toogleCheckIn, changeDayScheduleType, markLate, todaysStatus, reportType1 };
+const megaReport = async (req, res, next) => {
+  const { month, year } = req.body;
+
+  try {
+    const startDate = new Date(year, month - 1, 1); // First day of the month
+    const endDate = new Date(year, month, 0); // Last day of the month
+    const monthInWords = startDate.toLocaleString("default", { month: "long" });
+
+    const employees = await Employee.find({}, "_id");
+    const workbook = XLSX.utils.book_new();
+    const worksheets = {};
+
+    // Process each employee's data sequentially
+    for (const emp of employees) {
+      const results = await WorkdayStatus.find(
+        {
+          "checkIns.employeeId": emp._id,
+          date: {
+            $gte: startDate,
+            $lt: endDate.setDate(endDate.getDate() + 1),
+          },
+        },
+        { "checkIns.$": 1 }
+      );
+
+      const filteredCheckIns = results.flatMap((doc) =>
+        doc.checkIns.filter((checkin) => checkin.employeeId.equals(emp._id))
+      );
+
+      const employeeInfo = await Employee.findById(emp._id, "firstname");
+      const firstName = employeeInfo ? employeeInfo.firstname : "Unknown";
+
+      const worksheetData = filteredCheckIns.map((checkIn) => {
+        const { checkInTime, scheduleType, isPresent, isLate } = checkIn;
+        return {
+          Date: checkInTime,
+          "Day Type": scheduleType,
+          "Is Present": isPresent ? "Present" : "Absent",
+          "Is Late": isLate ? "Late" : "",
+        };
+      });
+
+      if (!worksheets[firstName]) {
+        worksheets[firstName] = XLSX.utils.json_to_sheet(worksheetData);
+        XLSX.utils.book_append_sheet(
+          workbook,
+          worksheets[firstName],
+          firstName
+        );
+      } else {
+        XLSX.utils.sheet_add_json(worksheets[firstName], worksheetData, {
+          skipHeader: true,
+          origin: -1,
+        });
+      }
+    }
+
+    // Convert workbook to buffer
+    const buffer = XLSX.write(workbook, {
+      type: "buffer",
+      bookType: "xlsx",
+    });
+
+    // Save buffer to file synchronously
+    fs.writeFileSync(`${monthInWords}.xlsx`, buffer);
+
+    res
+      .status(200)
+      .json({ message: "Excel sheet generated and saved successfully." });
+  } catch (error) {
+    next(error);
+  }
+};
+export {
+  toogleCheckIn,
+  changeDayScheduleType,
+  markLate,
+  todaysStatus,
+  reportType1,
+  megaReport,
+};

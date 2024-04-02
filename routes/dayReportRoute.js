@@ -5,7 +5,7 @@ import {
   markLate,
   todaysStatus,
   reportType1,
-
+  megaReport,
 } from "../controllers/dayReportController.js";
 import { ifOprator, verifyToken } from "../middleware/verifyUser.js";
 const router = Router();
@@ -20,5 +20,7 @@ router.post(
 );
 router.post("/markLate/:empId", verifyToken, ifOprator, markLate);
 router.post("/getReport", reportType1);
+
+router.post("/megaReport", megaReport);
 
 export default router;
